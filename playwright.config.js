@@ -1,0 +1,1 @@
+module.exports = {testDir:'./tests',testMatch:'*.spec.js',use:{baseURL:'http://127.0.0.1:8081',headless:true},webServer:{command:'PORT=8081 node server.js',url:'http://127.0.0.1:8081',reuseExistingServer:false}};

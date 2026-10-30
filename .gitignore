@@ -1,0 +1,9 @@
+node_modules/
+test-results/
+playwright-report/
+tests/*.png
+.env
+.env.*
+
+# Tài liệu .md chỉ giữ ở local, không đưa lên server/git (quy tắc triển khai)
+*.md

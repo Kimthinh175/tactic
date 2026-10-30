@@ -1,0 +1,23 @@
+Chạy thử: npm install && npm start
+Mở http://127.0.0.1:8080
+Kiểm thử: npm test && npm run test:e2e
+Lần đầu cần: npx playwright install chromium
+
+Logic mục 4:
+- Chọn kỳ 1, 7 hoặc 14 ngày, kết thúc tại ngày mới nhất đã nhập; đối chiếu kỳ liền trước cùng độ dài.
+- Ngày chưa nhập không phải ngày có số liệu 0. Thiếu ngày, ngày trùng hoặc giá trị không hợp lệ: không kết luận xu hướng.
+- Chỉ số kỳ = tỷ số các tổng. Mẫu số bằng 0: chưa xác định; tỷ lệ thay đổi từ 0 không tính thành 0%.
+- Ngưỡng ít biến động chọn 0%, 5% hoặc 10%, bao gồm biên. Đây là quy ước mô tả, không phải kiểm định thống kê.
+- Đơn tăng/CPA giảm: cùng cải thiện; đơn giảm/CPA tăng: cùng suy giảm; hai trường hợp còn lại là đánh đổi.
+- Không chấm điểm sức khỏe, không tự suy ra nguyên nhân hoặc lợi nhuận.
+- Reach cộng theo ngày không phải unique reach cả kỳ; click/reach không phải CTR.
+- Kỳ phân tích độc lập với bộ lọc bảng/biểu đồ. Báo cáo text dùng kỳ phân tích.
+
+AI tùy chọn:
+Đặt GEMINI_API_KEY và GEMINI_MODEL trong môi trường tiến trình server rồi npm start.
+Không ghi key trong frontend hoặc localStorage. Server chỉ công khai các tệp giao diện cho phép.
+Tài liệu API: https://ai.google.dev/api/generate-content
+AI chỉ trả 3 hành động, cách đo và mã luận cứ. Server gắn lại luận cứ đã tính; frontend luôn giữ kết luận của bộ quy tắc.
+AI lỗi/chưa cấu hình/sai schema: giữ 3 gợi ý theo quy tắc. Kết quả AI bị loại khi dữ liệu hoặc cấu hình phân tích đổi.
+Gợi ý AI là giả thuyết cần kiểm chứng, không thể bảo đảm nội dung mô hình luôn đúng chỉ bằng kiểm tra schema.
+Kiểm thử trình duyệt có mô phỏng phản hồi AI thành công; không gọi dịch vụ AI thật khi chưa có cấu hình môi trường.
