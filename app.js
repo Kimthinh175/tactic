@@ -1532,59 +1532,137 @@ function exportToCsv() {
   showToast("Đã tải xuống file CSV thành công!", "success");
 }
 
-function handleCsvFileSelect(e) {
+// Toggle Template Download Dropdown Menu
+function toggleTemplateMenu(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const menu = document.getElementById("template-dropdown-menu");
+  if (!menu) return;
+  menu.classList.toggle("hidden");
+}
+window.toggleTemplateMenu = toggleTemplateMenu;
+
+// Close template menu when clicking outside
+document.addEventListener("click", (e) => {
+  const wrapper = document.getElementById("template-dropdown-wrapper");
+  const menu = document.getElementById("template-dropdown-menu");
+  if (menu && !menu.classList.contains("hidden")) {
+    if (!wrapper || !wrapper.contains(e.target)) {
+      menu.classList.add("hidden");
+    }
+  }
+});
+
+// Handle Campaign File Select (Excel, Word, PDF)
+async function handleCampaignFileSelect(e) {
   const file = e.target.files?.[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function (evt) {
-    try {
-      const text = evt.target.result;
-      const lines = text.trim().split(/\r\n|\n|\r/);
-      if (lines.length < 2) {
-        showToast("File CSV không có dữ liệu hợp lệ!", "error");
-        return;
-      }
+  const validExts = ['.xlsx', '.xls', '.csv', '.docx', '.doc', '.pdf'];
+  const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+  if (!validExts.includes(ext)) {
+    showToast(`Định dạng ${ext} không được hỗ trợ. Vui lòng chọn file Excel, Word, hoặc PDF!`, "error");
+    e.target.value = "";
+    return;
+  }
 
-      let count = 0;
-      for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(",");
-        if (parts.length >= 5) {
-          const date = parts[0].trim();
-          const reach = parseInt(parts[1], 10);
-          const clicks = parseInt(parts[2], 10);
-          const cost = parseFloat(parts[3]);
-          const orders = parseInt(parts[4], 10);
+  const iconIdle = document.getElementById("icon-import-idle");
+  const iconLoading = document.getElementById("icon-import-loading");
+  const labelText = document.getElementById("label-import-text");
+  const prevText = labelText ? labelText.innerText : "Nhập File (Excel/Word/PDF)";
 
-          if (CampaignAnalysis.isValidRow({date,reach,clicks,cost,orders})) {
-            const existIdx = state.data.findIndex((d) => d.date === date);
-            if (existIdx !== -1) {
-              state.data[existIdx] = { id: state.data[existIdx].id, date, reach, clicks, cost, orders };
-            } else {
-              state.data.push({
-                id: "csv-" + Date.now() + "-" + i,
-                date,
-                reach,
-                clicks,
-                cost,
-                orders,
-              });
-            }
-            count++;
-          }
+  if (iconIdle) iconIdle.classList.add("hidden");
+  if (iconLoading) iconLoading.classList.remove("hidden");
+  if (labelText) labelText.innerText = `Đang đọc ${file.name.slice(0, 14)}...`;
+
+  showToast(`Đang trích xuất dữ liệu từ file ${file.name}...`, "info");
+
+  try {
+    const base64 = await readFileAsBase64(file);
+    const response = await fetch('/api/import-file', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: file.name,
+        dataBase64: base64
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Không thể trích xuất dữ liệu từ file.');
+    }
+
+    const rows = result.rows || [];
+    let addedCount = 0;
+    let updatedCount = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (CampaignAnalysis.isValidRow(row)) {
+        const existIdx = state.data.findIndex((d) => d.date === row.date);
+        if (existIdx !== -1) {
+          state.data[existIdx] = {
+            id: state.data[existIdx].id,
+            date: row.date,
+            reach: row.reach,
+            clicks: row.clicks,
+            cost: row.cost,
+            orders: row.orders
+          };
+          updatedCount++;
+        } else {
+          state.data.push({
+            id: "file-" + Date.now() + "-" + i,
+            date: row.date,
+            reach: row.reach,
+            clicks: row.clicks,
+            cost: row.cost,
+            orders: row.orders
+          });
+          addedCount++;
         }
       }
-
-      sortDataByDate();
-      saveData();
-      renderDashboard();
-      showToast(`Đã nhập thành công ${count} ngày từ file CSV!`, "success");
-    } catch (err) {
-      showToast("Lỗi khi đọc file CSV!", "error");
     }
-  };
-  reader.readAsText(file);
+
+    sortDataByDate();
+    saveData();
+    renderDashboard();
+
+    const fileTypeLabel = ext.includes('xls') || ext === '.csv' ? 'Excel' : ext.includes('doc') ? 'Word' : 'PDF';
+    showToast(`🎉 Nhập thành công ${rows.length} ngày từ file ${fileTypeLabel} (${addedCount} ngày mới, ${updatedCount} ngày cập nhật)!`, "success");
+  } catch (err) {
+    console.error("Lỗi import file:", err);
+    showToast(`❌ ${err.message || "Lỗi khi xử lý file!"}`, "error");
+  } finally {
+    if (iconIdle) iconIdle.classList.remove("hidden");
+    if (iconLoading) iconLoading.classList.add("hidden");
+    if (labelText) labelText.innerText = prevText;
+    e.target.value = "";
+  }
 }
+window.handleCampaignFileSelect = handleCampaignFileSelect;
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === 'string') {
+        const base64 = result.includes(',') ? result.split(',')[1] : result;
+        resolve(base64);
+      } else {
+        reject(new Error('Không thể đọc file'));
+      }
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleCsvFileSelect(e) {
+  handleCampaignFileSelect(e);
+}
+window.handleCsvFileSelect = handleCsvFileSelect;
 
 // ==========================================
 // GEMINI 3.8 FLASH DEEP AI ANALYSIS & CHAT

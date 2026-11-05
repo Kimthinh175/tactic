@@ -4,6 +4,7 @@ const fsSync = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const {analyze, isValidRow, extractAllowedNumbers} = require('./analysis');
+const {parseCampaignFile} = require('./file-parser');
 
 // Load .env automatically if present
 try {
@@ -236,6 +237,88 @@ function createServer({fetchAI = fetch, env = process.env} = {}) {
         return json(200, { answer, contextId: input.contextId, cached: false, cachedTokens });
       } catch {
         return json(502, {error: 'AI chưa khả dụng hoặc câu trả lời không vượt qua kiểm soát'});
+      }
+    }
+
+    if (req.url === '/api/import-file' && req.method === 'POST') {
+      try {
+        let body = '';
+        for await (const chunk of req) {
+          body += chunk;
+          if (body.length > 25000000) return json(413, { error: 'File quá lớn (tối đa 25MB)' });
+        }
+        let input;
+        try { input = JSON.parse(body); } catch { return json(400, { error: 'JSON không hợp lệ' }); }
+        if (!input || !input.filename || !input.dataBase64) {
+          return json(400, { error: 'Thiếu thông tin file (filename hoặc dataBase64)' });
+        }
+        const buffer = Buffer.from(input.dataBase64, 'base64');
+        const rows = await parseCampaignFile(input.filename, buffer, { fetchAI, env });
+        if (!rows || rows.length === 0) {
+          return json(422, { error: 'Không tìm thấy dòng dữ liệu chiến dịch hợp lệ trong file. Vui lòng kiểm tra định dạng hoặc tải file mẫu để xem ví dụ.' });
+        }
+        return json(200, {
+          success: true,
+          filename: input.filename,
+          count: rows.length,
+          rows
+        });
+      } catch (err) {
+        return json(400, { error: err.message || 'Lỗi khi xử lý file' });
+      }
+    }
+
+    const urlObj = new URL(req.url, 'http://localhost');
+    if (urlObj.pathname === '/api/template' && req.method === 'GET') {
+      const type = (urlObj.searchParams.get('type') || 'xlsx').toLowerCase();
+      const filenames = {
+        xlsx: 'mau_kpi_chien_dich.xlsx',
+        csv: 'mau_kpi_chien_dich.csv',
+        docx: 'mau_kpi_chien_dich.docx',
+        pdf: 'mau_kpi_chien_dich.pdf'
+      };
+      const fname = filenames[type] || filenames.xlsx;
+      const fpath = path.join(__dirname, 'templates', fname);
+      try {
+        const data = await fs.readFile(fpath);
+        const mimes = {
+          xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          csv: 'text/csv; charset=utf-8',
+          docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          pdf: 'application/pdf'
+        };
+        res.writeHead(200, {
+          'Content-Type': mimes[type] || 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${fname}"`,
+          'Content-Length': data.length
+        });
+        return res.end(data);
+      } catch (err) {
+        return json(404, { error: 'Không tìm thấy file mẫu' });
+      }
+    }
+
+    if (urlObj.pathname.startsWith('/templates/') && req.method === 'GET') {
+      const safeFname = path.basename(urlObj.pathname);
+      const fpath = path.join(__dirname, 'templates', safeFname);
+      try {
+        const data = await fs.readFile(fpath);
+        const ext = safeFname.split('.').pop().toLowerCase();
+        const mimes = {
+          xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          csv: 'text/csv; charset=utf-8',
+          docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          pdf: 'application/pdf'
+        };
+        res.writeHead(200, {
+          'Content-Type': mimes[ext] || 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${safeFname}"`,
+          'Content-Length': data.length
+        });
+        return res.end(data);
+      } catch {
+        res.writeHead(404);
+        return res.end();
       }
     }
 

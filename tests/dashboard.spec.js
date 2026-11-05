@@ -107,3 +107,38 @@ test('AI chat assistant handles question and displays grounded answer', async ({
  await expect(page.locator('#ai-chat-thread')).toContainText('CPA biến động do chi phí CPC thay đổi');
 });
 
+test('template download and multimodal file import (Excel, Word, PDF)', async ({page, request}) => {
+  for (const type of ['xlsx', 'docx', 'pdf', 'csv']) {
+    const res = await request.get(`/api/template?type=${type}`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-disposition']).toContain(`mau_kpi_chien_dich.${type}`);
+  }
+
+  await page.goto('/');
+  page.on('dialog', d => d.accept());
+  await page.locator('#btn-clear-all').click();
+  await expect(page.locator('#data-table-body tr')).toHaveCount(0);
+
+  await page.locator('#btn-toggle-template-menu').click();
+  await expect(page.locator('#template-dropdown-menu')).toBeVisible();
+
+  const path = require('path');
+  const xlsxPath = path.join(__dirname, '..', 'templates', 'mau_kpi_chien_dich.xlsx');
+  await page.locator('#campaign-file-input').setInputFiles(xlsxPath);
+
+  await expect(page.locator('#toast-container')).toContainText('Nhập thành công');
+  await expect(page.locator('#data-table-body tr')).toHaveCount(7);
+  await expect(page.locator('#kpi-total-orders')).toHaveText('183 đơn');
+
+  const docxPath = path.join(__dirname, '..', 'templates', 'mau_kpi_chien_dich.docx');
+  await page.locator('#campaign-file-input').setInputFiles(docxPath);
+  await expect(page.locator('#toast-container')).toContainText('Nhập thành công');
+  await expect(page.locator('#data-table-body tr')).toHaveCount(7);
+
+  const pdfPath = path.join(__dirname, '..', 'templates', 'mau_kpi_chien_dich.pdf');
+  await page.locator('#campaign-file-input').setInputFiles(pdfPath);
+  await expect(page.locator('#toast-container')).toContainText('Nhập thành công');
+  await expect(page.locator('#data-table-body tr')).toHaveCount(7);
+});
+
+
