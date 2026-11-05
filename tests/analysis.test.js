@@ -35,3 +35,34 @@ test('dailyExtrema identifies best and worst days',()=>{
  assert.equal(res.extrema.maxOrdersDay.orders, 10);
 });
 
+test('< 7 days evaluates directly from date N to M, >= 7 days gives actionable recommendations', () => {
+  const fiveDays = [
+    { date: '2026-10-01', reach: 1000, clicks: 50, cost: 500000, orders: 10 },
+    { date: '2026-10-02', reach: 1200, clicks: 60, cost: 600000, orders: 12 },
+    { date: '2026-10-03', reach: 1100, clicks: 55, cost: 550000, orders: 11 },
+    { date: '2026-10-04', reach: 1300, clicks: 65, cost: 650000, orders: 13 },
+    { date: '2026-10-05', reach: 1400, clicks: 70, cost: 700000, orders: 14 },
+  ];
+
+  // 1. Five days (< 7 days): evaluates N-M, complete = false
+  const res5 = analyze(fiveDays, 7);
+  assert.equal(res5.complete, false);
+  assert.ok(res5.conclusion.includes('Đánh giá từ 01/10 đến 05/10'));
+  assert.ok(res5.conclusion.includes('5 ngày'));
+  assert.equal(res5.recommendations.length, 3);
+  assert.ok(res5.recommendations[0].title.includes('< 7 ngày'));
+
+  // 2. Seven days (>= 7 days): complete = true, gives 3 actionable recommendations!
+  const sevenDays = [
+    ...fiveDays,
+    { date: '2026-10-06', reach: 1500, clicks: 75, cost: 750000, orders: 16 },
+    { date: '2026-10-07', reach: 1600, clicks: 80, cost: 800000, orders: 18 },
+  ];
+  const res7 = analyze(sevenDays, 7);
+  assert.equal(res7.complete, true);
+  assert.ok(res7.conclusion.length > 5);
+  assert.equal(res7.recommendations.length, 3);
+  assert.ok(res7.recommendations.every(r => ['cvr', 'clickReach', 'cpa'].includes(r.evidenceId)));
+});
+
+

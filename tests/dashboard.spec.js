@@ -139,6 +139,10 @@ test('template download and multimodal file import (Excel, Word, PDF)', async ({
   await page.locator('#campaign-file-input').setInputFiles(pdfPath);
   await expect(page.locator('#toast-container')).toContainText('Nhập thành công');
   await expect(page.locator('#data-table-body tr')).toHaveCount(7);
+
+  // 7 days of template data produces immediate actionable recommendations!
+  await expect(page.locator('#ai-status-label')).toContainText('cùng cải thiện');
+  await expect(page.locator('#ai-recommendations-list > div')).toHaveCount(3);
 });
 
 

@@ -1007,10 +1007,13 @@ function analyzeCampaignIntelligence() {
   const ai = cached && cached.key === JSON.stringify(result);
   const recommendations = ai ? cached.recommendations : result.recommendations;
   const driverText = result.complete && result.driver?.driverSummary ? `\nPhân rã biến động CPA (CPA = CPC ÷ CVR): ${result.driver.driverSummary}` : '';
+  const rangeHeader = result.prevStart
+    ? `${result.start || '—'} → ${result.end || '—'} so với ${result.prevStart || '—'} → ${result.prevEnd || '—'}.`
+    : `Giai đoạn đánh giá: từ ${result.start || '—'} đến ${result.end || '—'} (${result.coverage.current} ngày).`;
   return {
     statusLabel: result.conclusion, statusColor: 'indigo', trendMetrics: [],
-    trendSummary: `${result.start || '—'} → ${result.end || '—'} so với ${result.prevStart || '—'} → ${result.prevEnd || '—'}.\nLuận điểm: ${result.conclusion}.${driverText}\nĐộ phủ: ${result.coverage.current}/${result.days} và ${result.coverage.previous}/${result.days} ngày. Ngưỡng ít biến động: ±${result.threshold}% (quy ước, không phải kiểm định thống kê).\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Không suy ra xu hướng khi thiếu ngày hoặc dữ liệu không hợp lệ.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
-    recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : 'Gợi ý theo quy tắc'}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:'Thử và đo lại'}))
+    trendSummary: `${rangeHeader}\nLuận điểm: ${result.conclusion}.${driverText}\nĐộ phủ: ${result.coverage.current}/${result.days} ngày.${result.prevStart ? ` Ngưỡng ít biến động: ±${result.threshold}% (quy ước).` : ' Đang trong giai đoạn máy học (< 7 ngày).'}\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Đang đánh giá trực tiếp số liệu từ ngày ' + (result.start || '—') + ' đến ' + (result.end || '—') + '; hệ thống sẽ kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
+    recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá giai đoạn máy học')}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'}))
   };
 }
 function analyzeCampaignIntelligenceOffline() { return analyzeCampaignIntelligence(); }
@@ -1890,11 +1893,12 @@ function renderHero() {
   document.getElementById("hero-cta")?.classList.remove("hidden");
   const snap = analysisSnapshot();
   h.textContent = snap.conclusion;
-  p.textContent = "· " + snap.days + " ngày gần nhất " + fmtShortDate(snap.start) + "–" + fmtShortDate(snap.end);
+  p.textContent = "· " + (snap.complete ? snap.days + " ngày gần nhất " : state.data.length + " ngày ") + fmtShortDate(snap.start) + "–" + fmtShortDate(snap.end);
   if (!snap.complete) {
     box.dataset.tone = "neutral";
-    s.textContent = "Kỳ hiện tại có " + snap.coverage.current + "/" + snap.days + " ngày, kỳ trước có " + snap.coverage.previous + "/" + snap.days +
-      " ngày. Cần đủ cả hai kỳ liền nhau để kết luận xu hướng.";
+    const totals = snap.current;
+    const bestDay = snap.extrema?.bestCpaDay ? ` · Ngày tốt nhất: ${fmtShortDate(snap.extrema.bestCpaDay.date)} (CPA ${formatCurrency(snap.extrema.bestCpaDay.cpa)})` : '';
+    s.textContent = `Tổng chi phí: ${formatCurrency(totals.cost)} · ${totals.orders} đơn hàng · CPA tb ${totals.cpa ? formatCurrency(Math.round(totals.cpa)) : 'Chưa xác định'}${bestDay} · Đang theo dõi máy học (đủ 7 ngày sẽ kích hoạt 03 gợi ý tối ưu).`;
     return;
   }
   const d = snap.delta, t = snap.threshold;
@@ -1902,7 +1906,8 @@ function renderHero() {
   const c = d.cpa === null ? 0 : Math.abs(d.cpa) <= t ? 0 : Math.sign(d.cpa);
   box.dataset.tone = o > 0 && c < 0 ? "good" : o < 0 && c > 0 ? "bad" : "neutral";
   const part = (label, v) => label + " " + (v === null ? "chưa xác định" : fmtDeltaPct(v).replace("▲ ", "+").replace("▼ ", "−"));
-  s.textContent = [part("Số đơn", d.orders), part("CPA", d.cpa), part("Chi phí", d.cost)].join(" · ") + " so với kỳ liền trước.";
+  const comparedText = snap.prevStart ? `so với ${fmtShortDate(snap.prevStart)}–${fmtShortDate(snap.prevEnd)}.` : 'so với nửa đầu tuần.';
+  s.textContent = [part("Số đơn/ngày", d.orders), part("CPA", d.cpa), part("Chi phí/ngày", d.cost)].join(" · ") + " " + comparedText;
 }
 
 function cpaBar(item, avgCpa, topCpa) {
