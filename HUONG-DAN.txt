@@ -1,23 +1,31 @@
-Chạy thử: npm install && npm start
-Mở http://127.0.0.1:8080
-Kiểm thử: npm test && npm run test:e2e
-Lần đầu cần: npx playwright install chromium
+Chạy thử:
+1. Cài đặt: npm install
+2. Cấu hình AI (tùy chọn): cp .env.example .env (điền GEMINI_API_KEY, model gemini-3.8-flash)
+3. Chạy dashboard: npm start
+4. Mở trình duyệt: http://127.0.0.1:8082 (hoặc PORT được chỉ định)
+5. Kiểm thử: npm test && npm run test:e2e
+(Lần đầu chạy e2e cần: npx playwright install chromium)
 
-Logic mục 4:
+Logic nghiệp vụ & kiến trúc phân tích (Tính năng 4):
 - Chọn kỳ 1, 7 hoặc 14 ngày, kết thúc tại ngày mới nhất đã nhập; đối chiếu kỳ liền trước cùng độ dài.
 - Ngày chưa nhập không phải ngày có số liệu 0. Thiếu ngày, ngày trùng hoặc giá trị không hợp lệ: không kết luận xu hướng.
 - Chỉ số kỳ = tỷ số các tổng. Mẫu số bằng 0: chưa xác định; tỷ lệ thay đổi từ 0 không tính thành 0%.
-- Ngưỡng ít biến động chọn 0%, 5% hoặc 10%, bao gồm biên. Đây là quy ước mô tả, không phải kiểm định thống kê.
+- Ngưỡng ít biến động chọn 0%, 5% hoặc 10%, bao gồm biên (quy ước mô tả, không ngộ nhận kiểm định thống kê).
+- Phân rã CPA toán học: CPA = CPC ÷ CVR. Code xác định chính xác biến động CPA chủ yếu do chi phí click (CPC) hay tỷ lệ chuyển đổi (CVR), hoặc do cả hai yếu tố cộng hưởng.
 - Đơn tăng/CPA giảm: cùng cải thiện; đơn giảm/CPA tăng: cùng suy giảm; hai trường hợp còn lại là đánh đổi.
-- Không chấm điểm sức khỏe, không tự suy ra nguyên nhân hoặc lợi nhuận.
-- Reach cộng theo ngày không phải unique reach cả kỳ; click/reach không phải CTR.
-- Kỳ phân tích độc lập với bộ lọc bảng/biểu đồ. Báo cáo text dùng kỳ phân tích.
+- Reach cộng theo ngày không phải unique reach cả kỳ; click/reach không phải CTR chuẩn.
 
-AI tùy chọn:
-Đặt GEMINI_API_KEY và GEMINI_MODEL trong môi trường tiến trình server rồi npm start.
-Không ghi key trong frontend hoặc localStorage. Server chỉ công khai các tệp giao diện cho phép.
-Tài liệu API: https://ai.google.dev/api/generate-content
-AI chỉ trả 3 hành động, cách đo và mã luận cứ. Server gắn lại luận cứ đã tính; frontend luôn giữ kết luận của bộ quy tắc.
-AI lỗi/chưa cấu hình/sai schema: giữ 3 gợi ý theo quy tắc. Kết quả AI bị loại khi dữ liệu hoặc cấu hình phân tích đổi.
-Gợi ý AI là giả thuyết cần kiểm chứng, không thể bảo đảm nội dung mô hình luôn đúng chỉ bằng kiểm tra schema.
-Kiểm thử trình duyệt có mô phỏng phản hồi AI thành công; không gọi dịch vụ AI thật khi chưa có cấu hình môi trường.
+Tích hợp AI thật & Kiểm soát đầu ra 6 lớp (Tiêu chuẩn Bảng A):
+1. Kiến trúc phân tách rõ ràng: Code là máy tính và trọng tài số liệu; AI (Gemini 3.8 Flash) là chuyên gia ngôn ngữ tự nhiên và đề xuất hành động. AI KHÔNG BAO GIỜ được tự ý tính lại số học.
+2. 6 lớp kiểm soát ở backend:
+   - Lớp 1: Ép JSON Schema chuẩn.
+   - Lớp 2: Kiểm soát định lượng (đúng 3 gợi ý, phủ đủ 3 trụ cột creative / budget_targeting / conversion, giới hạn ký tự).
+   - Lớp 3: Đối chiếu chiều xu hướng (direction alignment) khớp 100% với code toán.
+   - Lớp 4: Chặn các cụm từ cấm (cam kết 100%, đảm bảo tăng, kết luận võ đoán).
+   - Lớp 5: Kiểm chứng số liệu (Fact-checking): trích xuất toàn bộ con số trong văn bản phản hồi và đối chiếu với danh sách Facts tính sẵn; chặn số bịa.
+   - Lớp 6: Dự phòng an toàn (Graceful fallback): Nếu API lỗi hoặc vi phạm guardrails -> tự động hiển thị gợi ý theo quy tắc, ghi rõ nhãn nguồn gốc.
+3. Hỏi đáp ngữ cảnh chiến dịch (AI Q&A Assistant) có Context Caching:
+   - Tự động băm (hash) dữ liệu hai kỳ thành contextId và lưu Facts trong RAM Cache (TTL 30 phút).
+   - Câu hỏi gửi kèm contextId: tận dụng cache máy chủ, không cần truyền lại toàn bộ dữ liệu bảng.
+   - Hit RAM Cache: Trả ngay câu trả lời đã lưu nếu hỏi lặp lại (0ms, 0 token quota).
+   - Prompt tối ưu implicit caching của Gemini: Rules & Facts đặt ở đầu, câu hỏi đặt ở cuối.

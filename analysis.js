@@ -68,9 +68,97 @@
         : rec('Đặt CPA mục tiêu trước khi đổi ngân sách', ev('cpa'), 'Xác định CPA chấp nhận được và mục tiêu đơn; đối chiếu cả hai sau thử nghiệm, chưa suy ra lợi nhuận.', 'cpa');
       return [conv, creative, budget];
     })();
-    return {days,threshold,start,end,prevStart,prevEnd,current,previous,complete,delta,conclusion,evidence,recommendations,coverage:{current:currentRows.length,previous:previousRows.length}};
+    const driver = decomposeCpa(current, previous, delta);
+    const extrema = dailyExtrema(sorted);
+    return {days,threshold,start,end,prevStart,prevEnd,current,previous,complete,delta,conclusion,evidence,recommendations,driver,extrema,coverage:{current:currentRows.length,previous:previousRows.length}};
   }
-  const api = {analyze,totals,shift,isValidRow};
+  function decomposeCpa(current, previous, delta) {
+    if (!current || !previous || current.cpa === null || previous.cpa === null || delta.cpa === null) {
+      return { driverType: 'unknown', driverSummary: 'Chưa đủ dữ liệu để phân rã biến động CPA.' };
+    }
+    const dCpc = delta.cpc ?? 0;
+    const dCvr = delta.cvr ?? 0;
+    let driverType = 'mixed';
+    let driverSummary = '';
+    if (Math.abs(delta.cpa) <= 0.05) {
+      driverType = 'stable';
+      driverSummary = 'CPA giữ mức ổn định giữa hai kỳ.';
+    } else if (dCpc > 0 && dCvr < 0) {
+      driverType = 'both_worse';
+      driverSummary = `CPA tăng do cả hai yếu tố tiêu cực: CPC tăng (${dCpc.toFixed(1)}%) và CVR giảm (${dCvr.toFixed(1)}%).`;
+    } else if (dCpc < 0 && dCvr > 0) {
+      driverType = 'both_better';
+      driverSummary = `CPA giảm nhờ cả hai yếu tố tích cực: CPC giảm (${dCpc.toFixed(1)}%) và CVR tăng (${dCvr.toFixed(1)}%).`;
+    } else if (Math.abs(dCpc) >= Math.abs(dCvr)) {
+      driverType = 'cpc_driven';
+      const dir = dCpc > 0 ? 'tăng' : 'giảm';
+      driverSummary = `Biến động CPA chủ yếu do chi phí mỗi click (CPC ${dir} ${Math.abs(dCpc).toFixed(1)}%).`;
+    } else {
+      driverType = 'cvr_driven';
+      const dir = dCvr < 0 ? 'suy giảm' : 'cải thiện';
+      driverSummary = `Biến động CPA chủ yếu do tỷ lệ chuyển đổi đơn hàng (CVR ${dir} ${Math.abs(dCvr).toFixed(1)}%).`;
+    }
+    return { driverType, driverSummary };
+  }
+  function dailyExtrema(rows) {
+    const valid = (rows || []).filter(isValidRow);
+    if (valid.length === 0) return null;
+    const withMetrics = valid.map(r => ({
+      ...r,
+      cpa: r.orders > 0 ? r.cost / r.orders : null,
+      cpc: r.clicks > 0 ? r.cost / r.clicks : null,
+      cvr: r.clicks > 0 ? (r.orders * 100) / r.clicks : null,
+      clickReach: r.reach > 0 ? (r.clicks * 100) / r.reach : null
+    }));
+    const cpaDays = withMetrics.filter(r => r.cpa !== null);
+    const bestCpa = cpaDays.length > 0 ? cpaDays.reduce((min, r) => r.cpa < min.cpa ? r : min) : null;
+    const worstCpa = cpaDays.length > 0 ? cpaDays.reduce((max, r) => r.cpa > max.cpa ? r : max) : null;
+    const maxOrders = withMetrics.reduce((max, r) => r.orders > max.orders ? r : max, withMetrics[0]);
+    const maxCost = withMetrics.reduce((max, r) => r.cost > max.cost ? r : max, withMetrics[0]);
+    return {
+      bestCpaDay: bestCpa ? { date: bestCpa.date, cpa: Math.round(bestCpa.cpa), orders: bestCpa.orders } : null,
+      worstCpaDay: worstCpa ? { date: worstCpa.date, cpa: Math.round(worstCpa.cpa), orders: worstCpa.orders } : null,
+      maxOrdersDay: { date: maxOrders.date, orders: maxOrders.orders, cost: maxOrders.cost },
+      maxCostDay: { date: maxCost.date, cost: maxCost.cost, orders: maxCost.orders }
+    };
+  }
+  function extractAllowedNumbers(snapshot, rows = []) {
+    const set = new Set([0, 1, 2, 3, 4, 5, 7, 10, 14, 100]);
+    const addNum = val => {
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        const abs = Math.abs(val);
+        for (const v of [val, abs]) {
+          set.add(Math.round(v));
+          set.add(Math.round(v * 10) / 10);
+          set.add(Math.round(v * 100) / 100);
+          set.add(Math.floor(v));
+          set.add(Number(v.toFixed(1)));
+          set.add(Number(v.toFixed(2)));
+        }
+      }
+    };
+    if (snapshot) {
+      for (const group of [snapshot.current, snapshot.previous, snapshot.delta]) {
+        if (group) Object.values(group).forEach(addNum);
+      }
+      if (snapshot.extrema) {
+        for (const obj of Object.values(snapshot.extrema)) {
+          if (obj && typeof obj === 'object') Object.values(obj).forEach(addNum);
+        }
+      }
+    }
+    for (const r of rows) {
+      for (const k of ['cost', 'reach', 'clicks', 'orders']) addNum(r[k]);
+      if (r.orders > 0) addNum(r.cost / r.orders);
+      if (r.clicks > 0) {
+        addNum(r.cost / r.clicks);
+        addNum((r.orders * 100) / r.clicks);
+      }
+      if (r.reach > 0) addNum((r.clicks * 100) / r.reach);
+    }
+    return set;
+  }
+  const api = {analyze,totals,shift,isValidRow,decomposeCpa,dailyExtrema,extractAllowedNumbers};
   if (typeof module !== 'undefined') module.exports = api;
   else root.CampaignAnalysis = api;
 })(typeof window !== 'undefined' ? window : globalThis);

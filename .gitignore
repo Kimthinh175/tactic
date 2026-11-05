@@ -4,6 +4,7 @@ playwright-report/
 tests/*.png
 .env
 .env.*
+!.env.example
 
 # Tài liệu .md chỉ giữ ở local, không đưa lên server/git (quy tắc triển khai)
 *.md

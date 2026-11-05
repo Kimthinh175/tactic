@@ -944,9 +944,10 @@ function analyzeCampaignIntelligence() {
   const cached = state.geminiAnalysisResult;
   const ai = cached && cached.key === JSON.stringify(result);
   const recommendations = ai ? cached.recommendations : result.recommendations;
+  const driverText = result.complete && result.driver?.driverSummary ? `\nPhân rã biến động CPA (CPA = CPC ÷ CVR): ${result.driver.driverSummary}` : '';
   return {
     statusLabel: result.conclusion, statusColor: 'indigo', trendMetrics: [],
-    trendSummary: `${result.start || '—'} → ${result.end || '—'} so với ${result.prevStart || '—'} → ${result.prevEnd || '—'}.\nLuận điểm: ${result.conclusion}.\nĐộ phủ: ${result.coverage.current}/${result.days} và ${result.coverage.previous}/${result.days} ngày. Ngưỡng ít biến động: ±${result.threshold}% (quy ước, không phải kiểm định thống kê).\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Không suy ra xu hướng khi thiếu ngày hoặc dữ liệu không hợp lệ.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
+    trendSummary: `${result.start || '—'} → ${result.end || '—'} so với ${result.prevStart || '—'} → ${result.prevEnd || '—'}.\nLuận điểm: ${result.conclusion}.${driverText}\nĐộ phủ: ${result.coverage.current}/${result.days} và ${result.coverage.previous}/${result.days} ngày. Ngưỡng ít biến động: ±${result.threshold}% (quy ước, không phải kiểm định thống kê).\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Không suy ra xu hướng khi thiếu ngày hoặc dữ liệu không hợp lệ.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
     recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : 'Gợi ý theo quy tắc'}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:'Thử và đo lại'}))
   };
 }
@@ -1540,7 +1541,8 @@ async function runGeminiAiAnalysis() {
     const result = await response.json();
     if (!Array.isArray(result.recommendations) || result.recommendations.length !== 3 || !result.recommendations.every(r=>['title','why','measure'].every(k=>typeof r[k] === 'string'))) throw new Error('Invalid response');
     if (key !== JSON.stringify(analysisSnapshot())) return;
-    state.geminiAnalysisResult = {key,recommendations:result.recommendations};
+    state.currentContextId = result.contextId || null;
+    state.geminiAnalysisResult = {key,recommendations:result.recommendations,contextId:result.contextId,driver:result.driver};
     renderAiAnalysis(); showToast('Đã nhận 3 gợi ý AI; kết luận vẫn do quy tắc xác định.', 'success');
   } catch {
     state.geminiAnalysisResult = null; renderAiAnalysis();
@@ -1550,8 +1552,102 @@ async function runGeminiAiAnalysis() {
 
 function escapeHtml(text) {
   const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
+  return text ? String(text).replace(/[&<>"']/g, (m) => map[m]) : '';
 }
+
+async function askAiQuestion(question) {
+  const inputEl = document.getElementById('ai-chat-input');
+  if (inputEl) inputEl.value = question;
+  await submitAiQuestion();
+}
+
+async function submitAiQuestion() {
+  const inputEl = document.getElementById('ai-chat-input');
+  if (!inputEl) return;
+  const question = inputEl.value.trim();
+  if (!question) return;
+
+  const btn = document.getElementById('btn-submit-ai-chat');
+  const btnText = document.getElementById('ai-chat-btn-text');
+  const thread = document.getElementById('ai-chat-thread');
+  if (thread) thread.classList.remove('hidden');
+
+  const userMsgId = 'chat-msg-' + Date.now();
+  if (thread) {
+    thread.innerHTML += `
+      <div class="flex items-start space-x-2.5 justify-end">
+        <div class="p-3 rounded-2xl bg-indigo-600 text-white text-xs sm:text-sm max-w-[85%] shadow-sm">
+          <p class="font-medium">${escapeHtml(question)}</p>
+        </div>
+      </div>
+      <div id="${userMsgId}" class="flex items-start space-x-2.5">
+        <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center text-[10px] text-indigo-600 font-bold shrink-0">AI</div>
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs sm:text-sm max-w-[85%] border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+          <p class="animate-pulse">Đang đối chiếu dữ liệu chiến dịch và phản hồi...</p>
+        </div>
+      </div>
+    `;
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  inputEl.value = '';
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.textContent = 'Đang trả lời...';
+
+  const snapshot = analysisSnapshot();
+  const payload = {
+    rows: state.data,
+    days: snapshot.days,
+    threshold: snapshot.threshold,
+    contextId: state.currentContextId || undefined,
+    question
+  };
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(25000)
+    });
+    if (!res.ok) throw new Error('Chat failed');
+    const data = await res.json();
+    if (data.contextId) state.currentContextId = data.contextId;
+
+    const el = document.getElementById(userMsgId);
+    if (el) {
+      const cacheBadge = data.cached
+        ? `<span class="inline-flex items-center text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full mr-2">⚡ Hit RAM Cache (0 token)</span>`
+        : `<span class="inline-flex items-center text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full mr-2">🤖 Gemini 3.8 Flash</span>`;
+
+      el.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center text-[10px] text-indigo-600 font-bold shrink-0">AI</div>
+        <div class="p-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs sm:text-sm max-w-[85%] border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div class="flex items-center mb-1.5 flex-wrap gap-1">
+            ${cacheBadge}
+            <span class="text-[10px] text-slate-400">Đã qua 6 lớp kiểm soát số liệu</span>
+          </div>
+          <p class="leading-relaxed font-normal whitespace-pre-line">${escapeHtml(data.answer)}</p>
+        </div>
+      `;
+    }
+  } catch {
+    const el = document.getElementById(userMsgId);
+    if (el) {
+      el.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center text-[10px] text-rose-600 font-bold shrink-0">!</div>
+        <div class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs sm:text-sm max-w-[85%] border border-rose-200 dark:border-rose-900/50 shadow-sm">
+          <p>Không thể kết nối tới AI hoặc câu trả lời không vượt qua kiểm soát số liệu. Vui lòng thử lại với câu hỏi cụ thể hơn.</p>
+        </div>
+      `;
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = 'Gửi câu hỏi';
+    if (thread) thread.scrollTop = thread.scrollHeight;
+  }
+}
+
 
 
 

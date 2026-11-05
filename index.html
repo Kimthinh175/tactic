@@ -471,6 +471,51 @@
           <!-- Injected by JS -->
         </div>
       </div>
+
+      <!-- Interactive AI Q&A Assistant with Context Caching -->
+      <div class="mt-6 pt-5 border-t border-slate-200/80 dark:border-slate-800">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <span class="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            </span>
+            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">
+              Hỏi Đáp Ngữ Cảnh Chiến Dịch (AI Q&A Assistant)
+            </h4>
+            <span id="ai-cache-indicator" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              Context Caching Active
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 hidden sm:inline">Đối chiếu 100% số liệu thực tế • 6 lớp kiểm soát</span>
+        </div>
+
+        <!-- Quick Question Prompts -->
+        <div class="flex flex-wrap gap-2 mb-3">
+          <button type="button" onclick="askAiQuestion('Vì sao CPA lại biến động trong kỳ này?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
+            💬 Vì sao CPA biến động?
+          </button>
+          <button type="button" onclick="askAiQuestion('Ngày nào trong dữ liệu mang lại hiệu quả tốt nhất?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
+            📅 Ngày nào hiệu quả nhất?
+          </button>
+          <button type="button" onclick="askAiQuestion('Nên ưu tiên hành động nào trước để hạ CPA mà không mất đơn?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
+            🎯 Ưu tiên hành động nào trước?
+          </button>
+        </div>
+
+        <!-- Chat messages container -->
+        <div id="ai-chat-thread" class="space-y-3 max-h-72 overflow-y-auto pr-1 mb-3 hidden">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Input box -->
+        <div class="flex items-center space-x-2">
+          <input type="text" id="ai-chat-input" placeholder="Hỏi AI bất kỳ điều gì về số liệu chiến dịch này..." class="flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400" onkeydown="if(event.key==='Enter') submitAiQuestion()" />
+          <button type="button" id="btn-submit-ai-chat" onclick="submitAiQuestion()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 shrink-0">
+            <span id="ai-chat-btn-text">Gửi câu hỏi</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </div>
+      </div>
     </section>
 
   </main>

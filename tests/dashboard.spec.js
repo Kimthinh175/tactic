@@ -19,6 +19,7 @@ test('input → evidence → persistence → export → AI fallback',async({page
  await page.locator('#btn-open-export-modal').click();
  await expect(page.locator('#export-report-text')).toHaveValue(/50.000 → 80.000; 60%/);
  await page.evaluate(()=>closeExportModal());
+ await page.route('**/api/recommendations', route => route.abort());
  await page.locator('#btn-run-gemini-ai').click();
  await expect(page.locator('#toast-container')).toContainText('AI chưa khả dụng');
  await expect(page.locator('#ai-status-label')).toContainText('cùng suy giảm');
@@ -90,3 +91,19 @@ test('bulk entry saves several days and ignores negative data',async({page})=>{
  await expect(page.locator('#ai-status-label')).toContainText('ít biến động');
  await page.reload();await expect(page.locator('#data-table-body tr')).toHaveCount(2);
 });
+
+test('AI chat assistant handles question and displays grounded answer', async ({page}) => {
+ await page.goto('/');
+ await page.evaluate(() => loadSampleDataAction());
+ await page.route('**/api/chat', route => route.fulfill({
+  json: {
+   answer: 'CPA biến động do chi phí CPC thay đổi từ 2.500 lên 2.666.',
+   contextId: 'ctx123',
+   cached: false
+  }
+ }));
+ await page.locator('#ai-chat-input').fill('Vì sao CPA biến động?');
+ await page.locator('#btn-submit-ai-chat').click();
+ await expect(page.locator('#ai-chat-thread')).toContainText('CPA biến động do chi phí CPC thay đổi');
+});
+

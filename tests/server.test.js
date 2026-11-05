@@ -26,3 +26,66 @@ test('upstream failure and missing config produce usable fallback statuses',asyn
  const noKey=await withServer(t,async()=>{throw new Error('must not call');},{});assert.equal((await noKey(input)).status,503);
  assert.equal((await post({...input,rows:[{...input.rows[0],cost:-1}]})).status,400);
 });
+test('chat endpoint answers grounded question and utilizes RAM context cache',async t=>{
+ let callCount = 0;
+ const server = createServer({
+  fetchAI: async (url, options) => {
+   callCount++;
+   return {
+    ok: true,
+    json: async () => ({
+     candidates: [{ content: { parts: [{ text: 'CPA tăng 300% do chi phí tăng lên 200.' }] } }]
+    })
+   };
+  },
+  env: {GEMINI_API_KEY:'test-key', GEMINI_MODEL:'gemini-3.8-flash'}
+ });
+ await new Promise(r => server.listen(0, '127.0.0.1', r));
+ t.after(() => new Promise(r => server.close(r)));
+ const port = server.address().port;
+
+ const res1 = await fetch(`http://127.0.0.1:${port}/api/chat`, {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({...input, question: 'Vì sao CPA tăng?'})
+ });
+ assert.equal(res1.status, 200);
+ const data1 = await res1.json();
+ assert.ok(data1.contextId);
+ assert.equal(data1.cached, false);
+ assert.equal(callCount, 1);
+
+ // Second call with same question & contextId -> hits RAM cache!
+ const res2 = await fetch(`http://127.0.0.1:${port}/api/chat`, {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({contextId: data1.contextId, question: 'Vì sao CPA tăng?'})
+ });
+ assert.equal(res2.status, 200);
+ const data2 = await res2.json();
+ assert.equal(data2.cached, true);
+ assert.equal(data2.why, 'hit_ram_cache');
+ assert.equal(callCount, 1); // No new AI call!
+});
+test('chat endpoint rejects banned phrases and ungrounded numbers',async t=>{
+ const server = createServer({
+  fetchAI: async () => ({
+   ok: true,
+   json: async () => ({
+    candidates: [{ content: { parts: [{ text: 'Chúng tôi cam kết 100% doanh thu sẽ tăng 999999 tỷ.' }] } }]
+   })
+  }),
+  env: {GEMINI_API_KEY:'test-key', GEMINI_MODEL:'gemini-3.8-flash'}
+ });
+ await new Promise(r => server.listen(0, '127.0.0.1', r));
+ t.after(() => new Promise(r => server.close(r)));
+ const port = server.address().port;
+
+ const res = await fetch(`http://127.0.0.1:${port}/api/chat`, {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({...input, question: 'Có cam kết không?'})
+ });
+ assert.equal(res.status, 502);
+});
+

@@ -17,3 +17,21 @@ test('ratios from totals and inclusive threshold',()=>{
  assert.equal(totals(rows({cost:100,orders:1},{cost:100,orders:9})).cpa,20);
  assert.ok(analyze(rows({orders:100,cost:100}, {orders:105,cost:105}),1,5).conclusion.includes('ít biến động'));
 });
+test('CPA decomposition correctly attributes CPC and CVR changes',()=>{
+ const res = analyze(rows({cost:100,clicks:10,orders:5},{cost:200,clicks:10,orders:2}),1);
+ assert.ok(res.driver);
+ assert.equal(res.driver.driverType, 'both_worse');
+ assert.ok(res.driver.driverSummary.includes('yếu tố tiêu cực'));
+});
+test('dailyExtrema identifies best and worst days',()=>{
+ const res = analyze([
+  {date:'2026-10-01',reach:100,clicks:10,cost:100,orders:10},
+  {date:'2026-10-02',reach:100,clicks:10,cost:200,orders:5},
+  {date:'2026-10-03',reach:100,clicks:10,cost:50,orders:10}
+ ], 1);
+ assert.ok(res.extrema);
+ assert.equal(res.extrema.bestCpaDay.date, '2026-10-03');
+ assert.equal(res.extrema.worstCpaDay.date, '2026-10-02');
+ assert.equal(res.extrema.maxOrdersDay.orders, 10);
+});
+
