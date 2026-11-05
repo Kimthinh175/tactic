@@ -145,4 +145,37 @@ test('template download and multimodal file import (Excel, Word, PDF)', async ({
   await expect(page.locator('#ai-recommendations-list > div')).toHaveCount(3);
 });
 
+test('screenshot image import triggers Gemini Vision OCR and populates dashboard', async ({page}) => {
+  await page.goto('/');
+  page.on('dialog', d => d.accept());
+  await page.locator('#btn-clear-all').click();
+
+  await page.route('**/api/import-file', async (route, req) => {
+    const postData = JSON.parse(req.postData() || '{}');
+    if (postData.filename && postData.filename.endsWith('.png')) {
+      await route.fulfill({
+        json: {
+          success: true,
+          filename: postData.filename,
+          count: 2,
+          rows: [
+            { date: '2026-10-01', reach: 25000, clicks: 700, cost: 1500000, orders: 30 },
+            { date: '2026-10-02', reach: 27000, clicks: 750, cost: 1600000, orders: 35 }
+          ]
+        }
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  const path = require('path');
+  const imgPath = path.join(__dirname, 'brave_uploaded_excel.png');
+  await page.locator('#campaign-file-input').setInputFiles(imgPath);
+
+  await expect(page.locator('#toast-container')).toContainText('Nhập thành công');
+  await expect(page.locator('#data-table-body tr')).toHaveCount(2);
+  await expect(page.locator('#kpi-total-orders')).toHaveText('65 đơn');
+});
+
 

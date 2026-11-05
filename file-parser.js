@@ -516,8 +516,101 @@ async function parsePdfBuffer(buffer) {
   return extractRowsWithVectorEngine(text);
 }
 
-async function parseCampaignFile(filename, buffer) {
+async function parseImageBuffer(buffer, filename, { fetchAI = fetch, env = process.env } = {}) {
+  if (!env || !env.GEMINI_API_KEY) {
+    throw new Error('Tính năng trích xuất số liệu từ ảnh chụp màn hình (OCR Vision) yêu cầu cấu hình GEMINI_API_KEY trong file .env');
+  }
+
+  const ext = (filename.split('.').pop() || 'png').toLowerCase();
+  const mimeTypes = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    webp: 'image/webp',
+    bmp: 'image/bmp',
+    gif: 'image/gif'
+  };
+  const mimeType = mimeTypes[ext] || 'image/png';
+  const base64Data = buffer.toString('base64');
+  const model = env.GEMINI_MODEL || 'gemini-3.8-flash';
+
+  const prompt = `Bạn là chuyên gia kế toán và phân tích số liệu quảng cáo hiệu suất (Performance Marketing).
+Nhiệm vụ của bạn là đọc và trích xuất dữ liệu báo cáo chiến dịch quảng cáo trong ảnh chụp màn hình này.
+Hãy trích xuất tất cả các dòng dữ liệu hợp lệ thành một mảng JSON chuẩn:
+[
+  {
+    "date": "YYYY-MM-DD",
+    "reach": 25000,
+    "clicks": 650,
+    "cost": 1500000,
+    "orders": 24
+  }
+]
+
+Quy tắc bắt buộc:
+1. "date": Định dạng YYYY-MM-DD (nếu ảnh ghi DD/MM/YYYY hoặc DD-MM hoặc ngày tháng, hãy quy đổi chính xác về YYYY-MM-DD).
+2. "reach", "clicks", "cost", "orders": đều là số nguyên dương >= 0 (loại bỏ ký tự đ, VNĐ, dấu chấm phân cách hàng ngàn).
+3. Tự đối soát chéo (Sanity check):
+   - Reach (tiếp cận/hiển thị) luôn lớn hơn hoặc bằng Clicks.
+   - Clicks luôn lớn hơn hoặc bằng Orders (đơn hàng).
+   - Nếu trong ảnh có cột CPA (Cost per Acquisition) hoặc CPC, hãy dùng phép chia CPA = Cost / Orders hoặc CPC = Cost / Clicks để kiểm chứng không bị đọc thiếu số 0 của số tiền!
+4. Nếu ảnh chụp màn hình có nhiều ngày, hãy trích xuất tất cả các ngày theo thứ tự.
+5. Chỉ trả về JSON thuần duy nhất, không thêm bất kỳ văn bản giải thích nào ngoài JSON.`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const response = await fetchAI(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': env.GEMINI_API_KEY
+    },
+    signal: AbortSignal.timeout(30000),
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType, data: base64Data } }
+        ]
+      }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error(`Lỗi kết nối Gemini Vision API (${response.status}): ${errText.slice(0, 150)}`);
+  }
+
+  const resData = await response.json();
+  const jsonStr = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!jsonStr) throw new Error('Không nhận được dữ liệu phản hồi từ mô hình Vision');
+
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    throw new Error('Dữ liệu JSON từ AI Vision không hợp lệ');
+  }
+
+  const list = Array.isArray(parsed) ? parsed : (parsed.rows || parsed.data || []);
+  const validRows = list
+    .map(r => ({
+      date: parseDate(r.date),
+      reach: Math.round(parseNumber(r.reach) || 0),
+      clicks: Math.round(parseNumber(r.clicks) || 0),
+      cost: Math.round(parseNumber(r.cost) || 0),
+      orders: Math.round(parseNumber(r.orders) || 0)
+    }))
+    .filter(isValidRow);
+
+  return validRows;
+}
+
+async function parseCampaignFile(filename, buffer, options = {}) {
   const ext = (filename.split('.').pop() || '').toLowerCase();
+  const imageExts = ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif'];
 
   if (['xlsx', 'xls', 'csv'].includes(ext)) {
     return parseExcelBuffer(buffer);
@@ -525,8 +618,10 @@ async function parseCampaignFile(filename, buffer) {
     return await parseWordBuffer(buffer);
   } else if (ext === 'pdf') {
     return await parsePdfBuffer(buffer);
+  } else if (imageExts.includes(ext)) {
+    return await parseImageBuffer(buffer, filename, options);
   }
-  throw new Error(`Định dạng file .${ext} không được hỗ trợ. Hãy chọn file Excel (.xlsx, .csv), Word (.docx), hoặc PDF (.pdf)`);
+  throw new Error(`Định dạng file .${ext} không được hỗ trợ. Hãy chọn file Excel (.xlsx, .csv), Word (.docx), PDF (.pdf), hoặc Ảnh chụp màn hình (.png, .jpg, .webp)`);
 }
 
 module.exports = {
@@ -534,6 +629,7 @@ module.exports = {
   parseExcelBuffer,
   parseWordBuffer,
   parsePdfBuffer,
+  parseImageBuffer,
   parseDate,
   parseNumber,
   vectorMatchColumnIndex,

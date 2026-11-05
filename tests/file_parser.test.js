@@ -120,3 +120,43 @@ test('parseCampaignFile parses CSV .csv with 100% precision (100% offline, zero 
   assert.equal(rows.length, 7);
   assert.equal(rows[0].date, '2026-10-01');
 });
+
+test('parseCampaignFile supports images via parseImageBuffer with Gemini Vision', async () => {
+  const mockImage = Buffer.from('fake-png-data');
+  const mockVisionReply = [
+    { date: '2026-10-01', reach: 20000, clicks: 600, cost: 1400000, orders: 25 },
+    { date: '2026-10-02', reach: 22000, clicks: 650, cost: 1500000, orders: 28 }
+  ];
+
+  const fakeFetch = async (url, options) => {
+    assert.ok(options.body.includes('inlineData'));
+    assert.ok(options.body.includes('image/png'));
+    return {
+      ok: true,
+      json: async () => ({
+        candidates: [{
+          content: { parts: [{ text: JSON.stringify(mockVisionReply) }] }
+        }]
+      })
+    };
+  };
+
+  const rows = await parseCampaignFile('screenshot.png', mockImage, {
+    fetchAI: fakeFetch,
+    env: { GEMINI_API_KEY: 'test-key', GEMINI_MODEL: 'gemini-3.8-flash' }
+  });
+
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].date, '2026-10-01');
+  assert.equal(rows[0].reach, 20000);
+  assert.equal(rows[0].cost, 1400000);
+  assert.equal(rows[0].orders, 25);
+});
+
+test('parseCampaignFile on image rejects when GEMINI_API_KEY is missing', async () => {
+  const mockImage = Buffer.from('fake-png-data');
+  await assert.rejects(
+    () => parseCampaignFile('screenshot.png', mockImage, { env: {} }),
+    /GEMINI_API_KEY/
+  );
+});

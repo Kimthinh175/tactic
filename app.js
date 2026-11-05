@@ -1555,29 +1555,33 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Handle Campaign File Select (Excel, Word, PDF)
-async function handleCampaignFileSelect(e) {
-  const file = e.target.files?.[0];
+// Process Campaign File (Excel, Word, PDF, or Screenshot Image via Gemini Vision)
+async function processCampaignFile(file, customFilename) {
   if (!file) return;
 
-  const validExts = ['.xlsx', '.xls', '.csv', '.docx', '.doc', '.pdf'];
-  const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+  const fname = customFilename || file.name || "campaign_data.png";
+  const validExts = ['.xlsx', '.xls', '.csv', '.docx', '.doc', '.pdf', '.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif'];
+  const ext = '.' + (fname.split('.').pop() || '').toLowerCase();
   if (!validExts.includes(ext)) {
-    showToast(`Định dạng ${ext} không được hỗ trợ. Vui lòng chọn file Excel, Word, hoặc PDF!`, "error");
-    e.target.value = "";
+    showToast(`Định dạng ${ext} không được hỗ trợ. Vui lòng chọn file Excel, Word, PDF hoặc Ảnh chụp màn hình (.png, .jpg, .webp)!`, "error");
     return;
   }
 
+  const isImage = ['.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif'].includes(ext);
   const iconIdle = document.getElementById("icon-import-idle");
   const iconLoading = document.getElementById("icon-import-loading");
   const labelText = document.getElementById("label-import-text");
-  const prevText = labelText ? labelText.innerText : "Nhập File (Excel/Word/PDF)";
+  const prevText = labelText ? labelText.innerText : "Nhập File / Ảnh OCR";
 
   if (iconIdle) iconIdle.classList.add("hidden");
   if (iconLoading) iconLoading.classList.remove("hidden");
-  if (labelText) labelText.innerText = `Đang đọc ${file.name.slice(0, 14)}...`;
+  if (labelText) labelText.innerText = isImage ? `Vision AI đang đọc...` : `Đang đọc ${fname.slice(0, 12)}...`;
 
-  showToast(`Đang trích xuất dữ liệu từ file ${file.name}...`, "info");
+  if (isImage) {
+    showToast(`📸 Đang gửi ảnh chụp màn hình tới Gemini Vision OCR để phân tích bảng số liệu...`, "info");
+  } else {
+    showToast(`Đang trích xuất dữ liệu từ file ${fname}...`, "info");
+  }
 
   try {
     const base64 = await readFileAsBase64(file);
@@ -1585,7 +1589,7 @@ async function handleCampaignFileSelect(e) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        filename: file.name,
+        filename: fname,
         dataBase64: base64
       })
     });
@@ -1631,17 +1635,25 @@ async function handleCampaignFileSelect(e) {
     saveData();
     renderDashboard();
 
-    const fileTypeLabel = ext.includes('xls') || ext === '.csv' ? 'Excel' : ext.includes('doc') ? 'Word' : 'PDF';
-    showToast(`🎉 Nhập thành công ${rows.length} ngày từ file ${fileTypeLabel} (${addedCount} ngày mới, ${updatedCount} ngày cập nhật)!`, "success");
+    const fileTypeLabel = isImage ? 'Ảnh chụp màn hình (Gemini Vision)' : (ext.includes('xls') || ext === '.csv' ? 'Excel' : ext.includes('doc') ? 'Word' : 'PDF');
+    showToast(`🎉 Nhập thành công ${rows.length} ngày từ ${fileTypeLabel} (${addedCount} ngày mới, ${updatedCount} ngày cập nhật)!`, "success");
   } catch (err) {
-    console.error("Lỗi import file:", err);
+    console.error("Lỗi import file/ảnh:", err);
     showToast(`❌ ${err.message || "Lỗi khi xử lý file!"}`, "error");
   } finally {
     if (iconIdle) iconIdle.classList.remove("hidden");
     if (iconLoading) iconLoading.classList.add("hidden");
     if (labelText) labelText.innerText = prevText;
-    e.target.value = "";
+    const input = document.getElementById("campaign-file-input");
+    if (input) input.value = "";
   }
+}
+
+// Handle Campaign File Select (File Dialog)
+async function handleCampaignFileSelect(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  await processCampaignFile(file, file.name);
 }
 window.handleCampaignFileSelect = handleCampaignFileSelect;
 
@@ -1666,6 +1678,27 @@ function handleCsvFileSelect(e) {
   handleCampaignFileSelect(e);
 }
 window.handleCsvFileSelect = handleCsvFileSelect;
+
+// Global Clipboard Paste Listener (Ctrl + V to paste screenshot directly)
+window.addEventListener("paste", async (e) => {
+  const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
+  if (activeTag === "input" || activeTag === "textarea") return;
+
+  const items = e.clipboardData?.items;
+  if (!items) return;
+
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type && items[i].type.indexOf("image") !== -1) {
+      e.preventDefault();
+      const blob = items[i].getAsFile();
+      if (blob) {
+        showToast("📋 Đã nhận ảnh từ Clipboard (Ctrl+V), đang gửi tới Gemini Vision AI...", "info");
+        await processCampaignFile(blob, `screenshot-${Date.now()}.png`);
+      }
+      break;
+    }
+  }
+});
 
 // ==========================================
 // GEMINI 3.8 FLASH DEEP AI ANALYSIS & CHAT

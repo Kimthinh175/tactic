@@ -253,7 +253,7 @@ function createServer({fetchAI = fetch, env = process.env} = {}) {
           return json(400, { error: 'Thiếu thông tin file (filename hoặc dataBase64)' });
         }
         const buffer = Buffer.from(input.dataBase64, 'base64');
-        const rows = await parseCampaignFile(input.filename, buffer);
+        const rows = await parseCampaignFile(input.filename, buffer, { fetchAI, env });
         if (!rows || rows.length === 0) {
           return json(422, { error: 'Không tìm thấy dòng dữ liệu chiến dịch hợp lệ trong file. Vui lòng kiểm tra định dạng hoặc tải file mẫu để xem ví dụ.' });
         }
