@@ -172,6 +172,76 @@ function loadSampleDataAction(showConfirm = false) {
   showToast("Đã tạo 14 ngày dữ liệu mô phỏng ngẫu nhiên (mỗi lần nạp là một kịch bản khác).", "success");
 }
 
+let clearPendingTimer = null;
+function clearAllData(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const btn = document.getElementById("btn-clear-all");
+
+  // If user clicks the 2nd time during pending state -> instant clear without needing browser dialog
+  if (btn && btn.dataset.pendingConfirm === "true") {
+    clearTimeout(clearPendingTimer);
+    btn.dataset.pendingConfirm = "false";
+    btn.innerHTML = `
+      <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+      Xóa hết
+    `;
+    btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition";
+    doClear();
+    return;
+  }
+
+  // First call window.confirm (for browsers that support it and Playwright E2E tests)
+  let confirmed = false;
+  try {
+    confirmed = confirm("Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Thao tác này sẽ đưa Dashboard về trạng thái trống ban đầu.");
+  } catch {
+    confirmed = false;
+  }
+
+  if (confirmed) {
+    doClear();
+  } else {
+    // If confirm was cancelled or suppressed by browser dialog blockers:
+    // Turn button into a direct 2nd-click confirmation for 4 seconds!
+    if (btn) {
+      btn.dataset.pendingConfirm = "true";
+      btn.innerHTML = `
+        <svg class="w-3.5 h-3.5 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        Bấm lại để xác nhận xóa hết!
+      `;
+      btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition animate-pulse";
+      showToast("Nhấp lại nút 'Xác nhận xóa hết' để đưa Dashboard về trạng thái trống!", "info");
+
+      clearPendingTimer = setTimeout(() => {
+        if (btn) {
+          btn.dataset.pendingConfirm = "false";
+          btn.innerHTML = `
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            Xóa hết
+          `;
+          btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition";
+        }
+      }, 4000);
+    }
+  }
+
+  function doClear() {
+    state.data = [];
+    state.geminiAnalysisResult = null;
+    state.currentContextId = null;
+    state.selectedRowId = null;
+    const thread = document.getElementById("ai-chat-thread");
+    if (thread) {
+      thread.innerHTML = "";
+      thread.classList.add("hidden");
+    }
+    saveData();
+    renderDashboard();
+    showToast("Đã đưa Dashboard về trạng thái trống ban đầu!", "info");
+  }
+}
+window.clearAllData = clearAllData;
+
 function sortDataByDate() {
   state.data.sort((a, b) => new Date(a.date) - new Date(b.date));
 }
@@ -207,15 +277,7 @@ function setupEventListeners() {
   // Clear all data
   const btnClearAll = document.getElementById("btn-clear-all");
   if (btnClearAll) {
-    btnClearAll.addEventListener("click", () => {
-      if (confirm("Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Thao tác này sẽ đưa Dashboard về trạng thái trống ban đầu.")) {
-        state.data = [];
-        state.geminiAnalysisResult = null;
-        saveData();
-        renderDashboard();
-        showToast("Đã đưa Dashboard về trạng thái trống ban đầu!", "info");
-      }
-    });
+    btnClearAll.addEventListener("click", clearAllData);
   }
 
   // Chart Type Selector
