@@ -12,6 +12,7 @@ test('input → evidence → persistence → export → AI fallback',async({page
  await page.locator('#analysis-days').selectOption('1');
  await expect(page.locator('#ai-status-label')).toContainText('cùng suy giảm');
  await expect(page.locator('#ai-trend-summary')).toContainText('50.000 → 80.000; 60%');
+ await expect(page.locator('#ai-interactive-panel')).toBeHidden();
  await expect(page.locator('#ai-recommendations-list > div')).toHaveCount(3);
  await page.reload();
  await expect(page.locator('#data-table-body tr')).toHaveCount(2);
@@ -21,6 +22,7 @@ test('input → evidence → persistence → export → AI fallback',async({page
  await page.evaluate(()=>closeExportModal());
  await page.route('**/api/recommendations', route => route.abort());
  await page.locator('#btn-run-gemini-ai').click();
+ await expect(page.locator('#ai-interactive-panel')).toBeVisible();
  await expect(page.locator('#toast-container')).toContainText('AI chưa khả dụng');
  await expect(page.locator('#ai-status-label')).toContainText('cùng suy giảm');
  await page.screenshot({path:'tests/dashboard.png',fullPage:true});
@@ -95,6 +97,19 @@ test('bulk entry saves several days and ignores negative data',async({page})=>{
 test('AI chat assistant handles question and displays grounded answer', async ({page}) => {
  await page.goto('/');
  await page.evaluate(() => loadSampleDataAction());
+ await expect(page.locator('#ai-interactive-panel')).toBeHidden();
+ await page.route('**/api/recommendations', route => route.fulfill({
+  json: {
+   recommendations: [
+    { title: 'Gợi ý 1', why: 'Vì CVR giảm', measure: 'Đo lại' },
+    { title: 'Gợi ý 2', why: 'Vì CPC tăng', measure: 'Giảm giá thầu' },
+    { title: 'Gợi ý 3', why: 'Vì CPA biến động', measure: 'Theo dõi' }
+   ],
+   contextId: 'ctx123'
+  }
+ }));
+ await page.locator('#btn-run-gemini-ai').click();
+ await expect(page.locator('#ai-interactive-panel')).toBeVisible();
  await page.route('**/api/chat', route => route.fulfill({
   json: {
    answer: 'CPA biến động do chi phí CPC thay đổi từ 2.500 lên 2.666.',

@@ -267,6 +267,7 @@ function clearAllData(e) {
     state.currentContextId = null;
     state.selectedRowId = null;
     clearAiRecommendationsStorage();
+    toggleAiPanel(false, false);
     const thread = document.getElementById("ai-chat-thread");
     if (thread) {
       thread.innerHTML = "";
@@ -1316,6 +1317,26 @@ function renderAiAnalysis() {
   updateAiButtonState();
 }
 
+function toggleAiPanel(show, shouldScroll = true) {
+  const panel = document.getElementById("ai-interactive-panel");
+  if (!panel) return;
+  const willShow = (show !== undefined) ? !!show : panel.classList.contains("hidden");
+  if (willShow) {
+    panel.classList.remove("hidden");
+    state.isAiPanelOpen = true;
+    if (shouldScroll) {
+      setTimeout(() => {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  } else {
+    panel.classList.add("hidden");
+    state.isAiPanelOpen = false;
+  }
+  updateAiButtonState();
+}
+window.toggleAiPanel = toggleAiPanel;
+
 function updateAiButtonState() {
   const btn = document.getElementById('btn-run-gemini-ai');
   const label = document.getElementById("gemini-btn-text");
@@ -1325,15 +1346,23 @@ function updateAiButtonState() {
   const key = JSON.stringify(snapshot);
   const cached = state.geminiAnalysisResult;
   const isCachedAi = cached && cached.key === key;
+  const panel = document.getElementById("ai-interactive-panel");
+  const isPanelOpen = panel && !panel.classList.contains("hidden");
 
-  if (isCachedAi) {
+  if (state.isGeminiLoading) {
+    label.textContent = "Đang tạo gợi ý…";
+    return;
+  }
+
+  if (isPanelOpen && isCachedAi) {
     label.textContent = "Làm mới gợi ý AI";
     btn.title = "Đã lưu 3 gợi ý AI trong LocalStorage (0 token). Nhấp để AI phân tích lại.";
-    btn.classList.add("text-primary-token");
+  } else if (isPanelOpen) {
+    label.textContent = "Làm mới gợi ý AI";
+    btn.title = "Đang hiển thị gợi ý. Nhấp để AI phân tích lại.";
   } else {
     label.textContent = "AI hỗ trợ cải thiện";
-    btn.title = "Phân tích chuyên sâu bằng AI";
-    btn.classList.remove("text-primary-token");
+    btn.title = "Khám phá 03 khuyến nghị hành động từ AI";
   }
 }
 
@@ -1870,6 +1899,7 @@ window.addEventListener("paste", async (e) => {
 // ==========================================
 
 async function runGeminiAiAnalysis() {
+  toggleAiPanel(true, true);
   if (state.isGeminiLoading) return;
   const snapshot = analysisSnapshot();
   const key = JSON.stringify(snapshot);
@@ -1909,12 +1939,14 @@ function escapeHtml(text) {
 }
 
 async function askAiQuestion(question) {
+  toggleAiPanel(true, false);
   const inputEl = document.getElementById('ai-chat-input');
   if (inputEl) inputEl.value = question;
   await submitAiQuestion();
 }
 
 async function submitAiQuestion() {
+  toggleAiPanel(true, false);
   const inputEl = document.getElementById('ai-chat-input');
   if (!inputEl) return;
   const question = inputEl.value.trim();
