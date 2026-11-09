@@ -1026,8 +1026,8 @@ function analyzeCampaignIntelligence() {
     rangeHeader,
     driverText,
     trendMetrics: [],
-    trendSummary: `${rangeHeader}\nLuận điểm: ${result.conclusion}.${driverText}\nĐộ phủ: ${result.coverage.current}/${result.days} ngày.${result.prevStart ? ` Ngưỡng ít biến động: ±${result.threshold}% (quy ước).` : ' Đang trong giai đoạn máy học (< 7 ngày).'}\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Đang đánh giá trực tiếp số liệu từ ngày ' + (result.start || '—') + ' đến ' + (result.end || '—') + '; hệ thống sẽ kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
-    recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá giai đoạn máy học')}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'}))
+    trendSummary: `${rangeHeader}\nĐánh giá chung: ${result.conclusion}.${driverText}\nSố ngày ghi nhận: ${result.coverage.current}/${result.days} ngày.${result.prevStart ? ` Ngưỡng ổn định: ±${result.threshold}% (quy ước).` : ' Đang trong giai đoạn thu thập dữ liệu ban đầu (< 7 ngày).'}\n${result.complete ? 'Chi tiết số liệu: ' + result.evidence.map(e=>e.text).join('\n') : 'Đang đánh giá trực tiếp số liệu từ ngày ' + (result.start || '—') + ' đến ' + (result.end || '—') + '; hệ thống sẽ kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.'}\nLưu ý: Click/reach không phải là CTR (click/lượt hiển thị). Tổng reach theo ngày có thể trùng lặp người xem giữa các ngày. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
+    recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá dữ liệu ban đầu')}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'}))
   };
 }
 function analyzeCampaignIntelligenceOffline() { return analyzeCampaignIntelligence(); }
@@ -1045,8 +1045,8 @@ function renderTrendBlocks(analysis) {
   let toneIcon = `<svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
 
   if (res.complete && res.delta) {
-    const o = Math.abs(res.delta.orders || 0) <= res.threshold ? 0 : Math.sign(res.delta.orders || 0);
-    const c = Math.abs(res.delta.cpa || 0) <= res.threshold ? 0 : Math.sign(res.delta.cpa || 0);
+    const o = Math.abs(res.delta.orders || 0) <= (res.threshold || 5) ? 0 : Math.sign(res.delta.orders || 0);
+    const c = Math.abs(res.delta.cpa || 0) <= (res.threshold || 5) ? 0 : Math.sign(res.delta.cpa || 0);
     if (o > 0 && c < 0) {
       toneBorder = "border-emerald-300/80 dark:border-emerald-800/80 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200";
       toneBadge = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300";
@@ -1062,7 +1062,7 @@ function renderTrendBlocks(analysis) {
     }
   }
 
-  // Khối 1: Chu kỳ so sánh & Độ phủ
+  // Khối 1: Chu kỳ so sánh & Dữ liệu ghi nhận
   const blockHeader = `
     <div class="flex flex-wrap items-center justify-between gap-2.5 p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs">
       <div class="flex items-center space-x-2.5 min-w-0">
@@ -1074,22 +1074,22 @@ function renderTrendBlocks(analysis) {
       </div>
       <div class="flex items-center space-x-1.5 shrink-0 flex-wrap">
         <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${res.complete ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'}">
-          Độ phủ: ${res.coverage.current}/${res.days} ngày
+          Dữ liệu: ${res.coverage.current}/${res.days} ngày
         </span>
-        ${res.prevStart ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Ngưỡng: ±${res.threshold}% (quy ước)</span>` : `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Giai đoạn máy học</span>`}
+        ${res.prevStart ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Ngưỡng ổn định: ±${res.threshold}% (quy ước)</span>` : `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Dữ liệu ban đầu (< 7 ngày)</span>`}
       </div>
     </div>
   `;
 
-  // Khối 2: Luận điểm cốt lõi (Core Verdict Card)
+  // Khối 2: Đánh giá tổng quan (Tình hình chiến dịch)
   const blockVerdict = `
     <div class="p-4 rounded-xl border ${toneBorder} shadow-xs">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider">
           ${toneIcon}
-          <span>Luận điểm</span>
+          <span>Đánh giá chung</span>
         </div>
-        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${toneBadge}">Kết luận xu hướng</span>
+        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${toneBadge}">Tình hình chiến dịch</span>
       </div>
       <div class="text-base sm:text-lg font-black tracking-tight leading-snug">
         ${escapeHtml(res.conclusion)}
@@ -1097,7 +1097,7 @@ function renderTrendBlocks(analysis) {
     </div>
   `;
 
-  // Khối 3: Phân rã biến động CPA (Root-Cause Driver)
+  // Khối 3: Vì sao chi phí mỗi đơn (CPA) thay đổi? (Root-Cause Driver)
   let blockDriver = '';
   if (res.complete && res.driver?.driverSummary) {
     blockDriver = `
@@ -1105,9 +1105,9 @@ function renderTrendBlocks(analysis) {
         <div class="flex items-center justify-between mb-1.5">
           <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
             <span class="text-sm">🔬</span>
-            <span>Phân rã biến động CPA (CPA = CPC ÷ CVR)</span>
+            <span>Vì sao giá mỗi đơn (CPA) thay đổi?</span>
           </div>
-          <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">Công thức chuẩn</span>
+          <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">CPA = Giá click ÷ Tỷ lệ chốt</span>
         </div>
         <p class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
           ${escapeHtml(res.driver.driverSummary)}
@@ -1116,7 +1116,7 @@ function renderTrendBlocks(analysis) {
     `;
   }
 
-  // Khối 4: Luận cứ số liệu chi tiết (Evidence Grid Cards)
+  // Khối 4: Chi tiết các chỉ số thực tế (Evidence Grid Cards)
   let blockEvidence = '';
   if (res.complete && Array.isArray(res.evidence) && res.evidence.length > 0) {
     const metricIcons = {
@@ -1130,10 +1130,10 @@ function renderTrendBlocks(analysis) {
     const metricNames = {
       cost: 'Chi phí/ngày',
       orders: 'Số đơn/ngày',
-      cpa: 'CPA (Giá/đơn)',
-      cpc: 'CPC (Giá/click)',
-      cvr: 'CVR (Tỷ lệ đơn)',
-      clickReach: 'Click/reach'
+      cpa: 'Giá mỗi đơn (CPA)',
+      cpc: 'Giá mỗi click (CPC)',
+      cvr: 'Tỷ lệ ra đơn (CVR)',
+      clickReach: 'Tỷ lệ click/tiếp cận'
     };
 
     const cards = res.evidence.map((ev) => {
@@ -1171,9 +1171,9 @@ function renderTrendBlocks(analysis) {
         <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           <span class="flex items-center space-x-1.5">
             <span>📊</span>
-            <span>Luận cứ số liệu chi tiết</span>
+            <span>Chi tiết các chỉ số thực tế</span>
           </span>
-          <span class="text-[10px] font-normal lowercase text-slate-400">đối soát giữa 2 kỳ</span>
+          <span class="text-[10px] font-normal lowercase text-slate-400">so sánh giữa 2 chu kỳ</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           ${cards}
@@ -1185,21 +1185,21 @@ function renderTrendBlocks(analysis) {
       <div class="p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/40 text-xs text-purple-900 dark:text-purple-200">
         <div class="font-bold mb-1 flex items-center space-x-1.5">
           <span>⏱️</span>
-          <span>Đang trong giai đoạn máy học (< 7 ngày)</span>
+          <span>Đang trong giai đoạn thu thập dữ liệu ban đầu (< 7 ngày)</span>
         </div>
         <p class="leading-relaxed text-purple-800/90 dark:text-purple-300">
-          Đang đánh giá trực tiếp số liệu từ ngày ${escapeHtml(res.start || '—')} đến ${escapeHtml(res.end || '—')} (${res.coverage.current} ngày). Hệ thống sẽ tự động kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.
+          Đang theo dõi số liệu thực tế từ ngày ${escapeHtml(res.start || '—')} đến ${escapeHtml(res.end || '—')} (${res.coverage.current} ngày). Hệ thống sẽ tự động đưa ra 03 gợi ý cải thiện chiến dịch khi tích lũy đủ 7 ngày.
         </p>
       </div>
     `;
   }
 
-  // Khối 5: Lưu ý kỹ thuật & Giới hạn dữ liệu (Disclaimers Box)
+  // Khối 5: Lưu ý khi đọc số liệu (Disclaimers Box)
   const blockDisclaimer = `
     <div class="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/40 text-[11px] text-slate-500 dark:text-slate-400 flex items-start space-x-2">
       <span class="text-xs shrink-0 mt-0.5">💡</span>
       <span class="leading-relaxed">
-        <strong class="font-semibold text-slate-600 dark:text-slate-300">Lưu ý kỹ thuật:</strong> Click/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.
+        <strong class="font-semibold text-slate-600 dark:text-slate-300">Lưu ý khi đọc số liệu:</strong> Tỷ lệ click/reach không tương đương với CTR (vì tính trên số người tiếp cận, không phải tổng lượt hiển thị). Tổng lượt tiếp cận (reach) cộng dồn theo ngày có thể bị trùng lặp người xem giữa các ngày. Báo cáo phản ánh hiệu quả vận hành quảng cáo, chưa tính doanh thu hoặc lợi nhuận thực tế.
       </span>
     </div>
   `;
