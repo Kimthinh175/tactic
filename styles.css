@@ -1,170 +1,487 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* ==========================================================================
+   Tactic AdPulse — Design System & Tokens
+   Mini Campaign KPI Dashboard (Light & Midnight Dark Mode)
+   ========================================================================== */
 
-:root {
-  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+:root,
+.force-light {
+  color-scheme: light;
+  --app-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Core Surfaces & Text */
+  --background: #f4f4f6;
+  --surface: #ffffff;
+  --surface-overlay: #ffffff;
+  --surface-hover: #f8f8fa;
+  --item-hover: #f4f4f6;
+  --background-hover: #e7e7ea;
+
+  --foreground: #18181b;
+  --muted: #686870;
+
+  /* Dual-Tier Hairline Borders (M13, M14)
+     --border: lighter than #e4e4e7 for cards, headers, and internal dividers
+     --border-strong: for inputs, selects, and outline buttons */
+  --border: #f0f0f3;
+  --border-strong: #e2e2e7;
+
+  /* Brand & Interactive Accent */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --primary-light: rgba(37, 99, 235, 0.08);
+
+  --secondary: #f4f4f6;
+  --secondary-hover: #d4d5dc;
+  --button-hover-surface: #e4e4e9;
+  --button-hover-page: #d8d8e0;
+  --button-hover: var(--button-hover-page);
+
+  /* Focus Ring & Border (I13: Only for inputs/selects/textareas) */
+  --border-focus: #2563eb;
+  --ring-focus: rgba(37, 99, 235, 0.14);
+
+  /* Category Palette — Tinted (P17: 4 Funnel Metrics) */
+  --cat-1: #2563eb; /* Chi phí (Cost) */
+  --cat-2: #0d9488; /* Tiếp cận (Reach) */
+  --cat-3: #7c3aed; /* Tỷ lệ nhấp (CTR / Clicks) */
+  --cat-4: #c026d3; /* Đơn hàng & CPA (Orders) */
+
+  /* Semantic Status Tokens (M7, M30) */
+  --success: #007a55;
+  --success-bg: #ecfdf5;
+  --warning: #bb4d00;
+  --warning-bg: #fffbeb;
+  --danger: #c70036;
+  --danger-bg: rgba(255, 32, 86, 0.1);
+  --error: #fb2c36;
+  --error-bg: #fef2f2;
+  --error-strong: #c10007;
+  --neutral: #52525c;
+  --neutral-bg: #f4f4f5;
+
+  /* Elevation */
+  --elevation-popover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+  --elevation-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+}
+
+.dark,
+.force-dark {
+  color-scheme: dark;
+
+  --background: #09090b;
+  --surface: #121215;
+  --surface-overlay: #18181c;
+  --surface-hover: #18181c;
+  --item-hover: rgba(255, 255, 255, 0.05);
+  --background-hover: #1f1f24;
+
+  --foreground: #f4f4f5;
+  --muted: #9ca3af;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --primary: #60a5fa;
+  --primary-hover: #93c5fd;
+  --primary-foreground: #09090b;
+  --primary-light: rgba(96, 165, 250, 0.14);
+
+  --secondary: rgba(255, 255, 255, 0.07);
+  --secondary-hover: rgba(255, 255, 255, 0.14);
+  --button-hover-surface: rgba(255, 255, 255, 0.12);
+  --button-hover-page: rgba(255, 255, 255, 0.12);
+  --button-hover: var(--button-hover-page);
+
+  --border-focus: rgba(96, 165, 250, 0.55);
+  --ring-focus: rgba(59, 130, 246, 0.18);
+
+  --cat-1: #60a5fa;
+  --cat-2: #2dd4bf;
+  --cat-3: #a78bfa;
+  --cat-4: #e879f9;
+
+  --success: #00d492;
+  --success-bg: rgba(0, 188, 125, 0.15);
+  --warning: #ff8904;
+  --warning-bg: rgba(254, 154, 0, 0.15);
+  --danger: #ff637e;
+  --danger-bg: rgba(255, 32, 86, 0.14);
+  --error: #fb2c36;
+  --error-bg: rgba(251, 44, 54, 0.12);
+  --error-strong: #ff6467;
+  --neutral: #a1a1aa;
+  --neutral-bg: rgba(113, 113, 123, 0.16);
+
+  --elevation-popover: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --elevation-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.65), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   Base Typography & Reset (T1, T6, T10, M31)
+   ========================================================================== */
+html {
+  font-family: var(--app-font);
+  scroll-behavior: auto !important;
 }
 
 body {
-  font-family: var(--font-main);
+  font-family: var(--app-font);
+  background-color: var(--background);
+  color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
 }
 
-code, pre, .font-mono {
-  font-family: var(--font-mono);
+h1, h2, h3, h4 {
+  text-wrap: balance;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+p {
+  text-wrap: pretty;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Tabular Numbers for all KPI figures, table cells, badges, and dates */
+.tabular-nums,
+.font-mono,
+td,
+th,
+input[type="date"],
+input[inputmode="numeric"] {
+  font-variant-numeric: tabular-nums;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 9999px;
+/* Placeholder contrast >= 4.5:1 (beats Tailwind CDN runtime preflight) */
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted) !important;
+  opacity: 1 !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.8);
+/* ==========================================================================
+   Focus & Interactive Discipline (I13)
+   - Inputs, selects, textareas: border-focus + 2px ring-focus
+   - Buttons, links, tabs: NO focus ring/outline
+   ========================================================================== */
+input:not([type="checkbox"]):not([type="radio"]):focus,
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: none !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 2px var(--ring-focus) !important;
 }
 
-/* Card hover & glassmorphism */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-.dark .glass-panel {
-  background: rgba(30, 41, 59, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Native date & select clean styling */
+select {
+  background-color: var(--surface);
+  color: var(--foreground);
+  border-color: var(--border-strong);
 }
 
-.dark .bg-slate-850,
-.dark .dark\:bg-slate-850 {
-  background-color: #1e293b !important;
+/* ==========================================================================
+   Semantic Utility Classes mapped to CSS Variables
+   ========================================================================== */
+.bg-app { background-color: var(--background); }
+.bg-surface { background-color: var(--surface); }
+.bg-surface-overlay { background-color: var(--surface-overlay); }
+.bg-surface-hover { background-color: var(--surface-hover); }
+.bg-item-hover { background-color: var(--item-hover); }
+.bg-secondary-token { background-color: var(--secondary); }
+
+.text-foreground { color: var(--foreground); }
+.text-muted { color: var(--muted); }
+.text-primary-token { color: var(--primary); }
+
+.border-border { border-color: var(--border); }
+.border-border-strong { border-color: var(--border-strong); }
+
+.shadow-popover { box-shadow: var(--elevation-popover); }
+.shadow-modal { box-shadow: var(--elevation-modal); }
+
+/* Category Icon Badges (P17 Tinted) */
+.cat-badge-1 {
+  background-color: color-mix(in srgb, var(--cat-1) 12%, transparent);
+  color: var(--cat-1);
+}
+.cat-badge-2 {
+  background-color: color-mix(in srgb, var(--cat-2) 12%, transparent);
+  color: var(--cat-2);
+}
+.cat-badge-3 {
+  background-color: color-mix(in srgb, var(--cat-3) 12%, transparent);
+  color: var(--cat-3);
+}
+.cat-badge-4 {
+  background-color: color-mix(in srgb, var(--cat-4) 12%, transparent);
+  color: var(--cat-4);
 }
 
-
-@keyframes spinSlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Button Hierarchy (I3: One Primary CTA per Screen) */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
 }
 
-.animate-spin-slow {
-  animation: spinSlow 8s linear infinite;
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--foreground);
+  border: 1px solid var(--border-strong);
+  transition: background-color 0.15s ease;
+}
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
 }
 
-/* Subtle glow animations */
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
+.btn-subtle {
+  background-color: var(--secondary);
+  color: var(--foreground);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease;
+}
+.btn-subtle:hover {
+  background-color: var(--secondary-hover);
 }
 
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.btn-danger-ghost {
+  background-color: transparent;
+  color: var(--muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-danger-ghost:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger);
 }
 
-/* Toast animations */
-@keyframes slideInUp {
+/* ==========================================================================
+   Executive Verdict Banner (#hero-summary) — Flat Semantic Status Bar (B12)
+   No left border stripe inside rounded card to avoid corner clipping.
+   ========================================================================== */
+#hero-summary {
+  background-color: var(--surface);
+  transition: background-color 0.2s ease;
+}
+#hero-summary.hero-scale,
+#hero-summary.hero-hold,
+#hero-summary.hero-warn,
+#hero-summary.hero-cut,
+#hero-summary.hero-neutral {
+  background-color: var(--surface);
+}
+
+/* Semantic Status Pills (M7) */
+.status-pill-scale {
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+.status-pill-warn {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+.status-pill-cut {
+  background-color: var(--error-bg);
+  color: var(--error-strong);
+}
+.status-pill-neutral {
+  background-color: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+/* ==========================================================================
+   Sparklines & KPI Cards
+   ========================================================================== */
+.kpi-card {
+  background-color: var(--surface);
+  transition: background-color 0.15s ease;
+}
+
+.sparkline-container svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   Table & Responsive Mobile Card-Row Layout (< 640px)
+   ========================================================================== */
+.data-row {
+  transition: background-color 0.12s ease;
+}
+.data-row:hover {
+  background-color: var(--surface-hover);
+}
+
+@media (max-width: 639px) {
+  .responsive-table thead,
+  .bulk-table thead {
+    display: none;
+  }
+  .responsive-table,
+  .responsive-table tbody,
+  .responsive-table tfoot,
+  .bulk-table,
+  .bulk-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .responsive-table tbody tr.data-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .responsive-table tbody tr.data-row td {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    text-align: left !important;
+    border: none !important;
+    position: static !important;
+  }
+  .responsive-table tbody tr.data-row td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 0.125rem;
+  }
+  .responsive-table tbody tr.data-row td.cell-date {
+    grid-column: span 1;
+  }
+  .responsive-table tbody tr.data-row td.cell-actions {
+    grid-column: span 1;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .responsive-table tbody tr.data-row td.cell-actions::before {
+    display: none;
+  }
+  .responsive-table tfoot tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+  .responsive-table tfoot td {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    text-align: left !important;
+    position: static !important;
+  }
+  .responsive-table tfoot td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .responsive-table tfoot td:empty {
+    display: none;
+  }
+
+  /* Bulk Modal Table on < 640px: 2-column stacked cards with full-width readable inputs */
+  .bulk-table tbody tr.bulk-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.625rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bulk-table tbody tr.bulk-row td {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    text-align: left !important;
+  }
+  .bulk-table tbody tr.bulk-row td[data-label]::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .bulk-table tbody tr.bulk-row td.bulk-cell-del {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+}
+
+/* ==========================================================================
+   Auto-Hiding 4px Scrollbar (I18 — exact tokens.css specification)
+   ========================================================================== */
+* { --scrollbar-thumb: transparent; }
+*:hover { --scrollbar-thumb: color-mix(in srgb, var(--foreground) 16%, transparent); }
+.is-scrolling { --scrollbar-thumb: color-mix(in srgb, var(--foreground) 28%, transparent); }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--foreground) 40%, transparent); }
+
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+  *:hover { scrollbar-color: color-mix(in srgb, var(--foreground) 18%, transparent) transparent; }
+  .is-scrolling { scrollbar-color: color-mix(in srgb, var(--foreground) 28%, transparent) transparent; }
+}
+
+.scrollbar-clean {
+  scrollbar-width: none;
+}
+.scrollbar-clean::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   Animations & Toast
+   ========================================================================== */
+@keyframes toastSlideIn {
   from {
-    transform: translateY(100%);
     opacity: 0;
+    transform: translateY(8px);
   }
   to {
-    transform: translateY(0);
     opacity: 1;
-  }
-}
-
-@keyframes slideOutDown {
-  from {
     transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(100%);
-    opacity: 0;
   }
 }
 
 .toast-enter {
-  animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: toastSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.toast-leave {
-  animation: slideOutDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Number input without spinners for cleaner look */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-/* KPI Card gradient borders */
-.kpi-card {
-  position: relative;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-}
-
-.dark .kpi-card:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-}
-
-/* Chart Canvas container */
-.chart-container {
-  position: relative;
-  height: 380px;
-  width: 100%;
-}
-
-/* Responsive data table: no horizontal scroll, wrap on desktop, stacked cards on mobile */
-.responsive-table td, .responsive-table th { overflow-wrap: anywhere; vertical-align: middle; }
-@media (max-width: 767px) {
-  .responsive-table thead { display: none; }
-  .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
-  .responsive-table tr { padding: 0.5rem 0.75rem; }
-  .responsive-table td {
-    display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
-    text-align: right !important; padding: 0.3rem 0 !important;
+/* Print Friendly */
+@media print {
+  header,
+  #section-data-management,
+  #bulk-modal,
+  #export-modal,
+  #toast-container,
+  #hero-cta,
+  #btn-refresh-ai {
+    display: none !important;
   }
-  .responsive-table td::before {
-    content: attr(data-label); font-weight: 600; color: #94a3b8; text-align: left; flex-shrink: 0;
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 }
-
-
-/* ===== UI v2.6 ===== */
-/* Dark: nền xanh đêm sâu hơn + quầng sáng nhẹ, tạo chiều sâu cho các thẻ */
-.dark body {
-  background:
-    radial-gradient(900px 420px at 85% -8%, rgba(99, 102, 241, 0.14), transparent 70%),
-    radial-gradient(700px 360px at 5% 0%, rgba(6, 182, 212, 0.07), transparent 70%),
-    #0b1120 !important;
-}
-.dark .kpi-card { background-color: #111a2e !important; }
-
-/* Hero tone glow */
-#hero-summary .hero-glow { background: rgba(99, 102, 241, 0.45); transition: background 0.4s; }
-#hero-summary[data-tone="good"] .hero-glow { background: rgba(16, 185, 129, 0.40); }
-#hero-summary[data-tone="bad"] .hero-glow { background: rgba(244, 63, 94, 0.38); }
-
-/* Sparkline container */
-.kpi-spark svg { display: block; }

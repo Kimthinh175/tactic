@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tactic AdPulse - Dashboard KPI Chiến Dịch Mini</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tactic AdPulse — Bảng điều khiển KPI Chiến dịch</title>
+  <meta name="description" content="Bảng điều khiển KPI chiến dịch quảng cáo, chẩn đoán phễu CPA = CPC ÷ CVR và khuyến nghị tối ưu ngân sách dành cho Performance Marketer." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='bold' fill='white' text-anchor='middle'>T</text></svg>" />
+
+  <!-- Inter Font (Single typeface across entire app — Rule T1) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -11,699 +19,976 @@
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
           colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+            app: 'var(--background)',
+            surface: 'var(--surface)',
+            'surface-subtle': 'var(--background)',
+            'surface-overlay': 'var(--surface-overlay)',
+            'surface-hover': 'var(--surface-hover)',
+            'item-hover': 'var(--item-hover)',
+            foreground: 'var(--foreground)',
+            muted: 'var(--muted)',
+            border: 'var(--border)',
+            'border-strong': 'var(--border-strong)',
+            primary: {
+              DEFAULT: 'var(--primary)',
+              hover: 'var(--primary-hover)',
+              foreground: 'var(--primary-foreground)',
+              light: 'var(--primary-light)',
             },
-            slate: {
-              850: '#151f32',
+            secondary: {
+              DEFAULT: 'var(--secondary)',
+              hover: 'var(--secondary-hover)',
+            },
+            cat: {
+              1: 'var(--cat-1)',
+              2: 'var(--cat-2)',
+              3: 'var(--cat-3)',
+              4: 'var(--cat-4)',
             }
           }
         }
       }
-    }
+    };
   </script>
-  <!-- Chart.js 4.x CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css?v=2.8">
-</head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200 flex flex-col">
 
-  <!-- TOP NAVIGATION / HEADER -->
-  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <!-- Logo & Title -->
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-app text-foreground min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ========================================================================
+       KHỐI 1: COMPACT EXECUTIVE TOP HEADER (Sticky, Flat Surface, 1 Primary CTA)
+       ======================================================================== -->
+  <header class="bg-surface border-b border-border sticky top-0 z-30">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
+      
+      <!-- Brand Identity + Active Campaign Context -->
+      <div class="flex items-center justify-between lg:justify-start gap-3 min-w-0 flex-1">
+        <div class="flex items-center gap-2.5 shrink-0">
+          <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm select-none">
+            T
           </div>
           <div>
-            <div class="flex items-center space-x-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded">Tactic AdPulse</span>
-              <span id="campaign-date-range-badge" class="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                Đang tải...
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm tracking-tight text-foreground">Tactic AdPulse</span>
+              <span id="campaign-date-range-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-muted tabular-nums">
+                Chưa có dữ liệu
               </span>
             </div>
-            <div class="flex items-center mt-0.5">
-              <input id="campaign-name-input" type="text" value="Chiến Dịch Mới (Chưa đặt tên)" title="Bấm vào để đổi tên chiến dịch"
-                class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none transition px-1 py-0.5 -ml-1 rounded truncate max-w-xs sm:max-w-md md:max-w-lg" />
-              <svg class="w-3.5 h-3.5 text-slate-400 ml-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-              </svg>
-            </div>
+            <p class="text-xs text-muted hidden sm:block">Chẩn đoán phễu &amp; tối ưu&nbsp;CPA</p>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center flex-wrap gap-2">
-          <!-- Reset to sample data -->
-          <button id="btn-load-sample" type="button" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-            <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Nạp mẫu ngẫu nhiên
-          </button>
+        <div class="h-5 w-px bg-border hidden sm:block shrink-0"></div>
 
-          <!-- Bulk data entry -->
-          <button id="btn-open-bulk-modal" type="button" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-            <svg class="w-4 h-4 mr-1.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            Nhập nhiều dòng
-          </button>
-
-          <!-- Export Report to Boss / Client -->
-          <button id="btn-open-export-modal" type="button" class="inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-sm shadow-indigo-500/25 transition">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
-            </svg>
-            Xuất Báo Cáo Gửi Sếp
-          </button>
-
-          <!-- Dark / Light theme toggle -->
-          <button id="btn-toggle-theme" type="button" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Đổi giao diện Sáng / Tối">
-            <!-- Icon injected by JS -->
-          </button>
+        <!-- Inline Editable Campaign Name Input -->
+        <div class="flex items-center gap-1.5 min-w-[150px] flex-1 max-w-sm">
+          <label for="campaign-name-input" class="sr-only">Tên chiến dịch</label>
+          <input
+            type="text"
+            id="campaign-name-input"
+            value="Chiến dịch Chuyển đổi Q4"
+            placeholder="Tên chiến dịch"
+            title="Nhấn để đổi tên chiến dịch"
+            class="w-full h-9 px-2.5 text-xs sm:text-sm font-semibold text-foreground bg-app hover:bg-secondary/60 rounded-lg border border-border-strong transition-colors truncate"
+          />
         </div>
       </div>
+
+      <!-- Header Action Toolbar (Uniform h-9 36px, text-xs, 1 Primary CTA) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button
+          type="button"
+          id="btn-load-sample"
+          title="Tạo bộ dữ liệu 14 ngày ngẫu nhiên để dùng thử"
+          class="h-9 px-2.5 sm:px-3 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <svg class="w-3.5 h-3.5 text-muted shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+          <span class="hidden sm:inline">Nạp mẫu 14 ngày</span>
+          <span class="sm:hidden">Nạp mẫu</span>
+        </button>
+
+        <button
+          type="button"
+          id="btn-open-bulk-modal"
+          title="Mở bảng nhập nhanh nhiều ngày liên tiếp"
+          class="h-9 px-2.5 sm:px-3 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <svg class="w-3.5 h-3.5 text-muted shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="hidden sm:inline">Nhập hàng loạt</span>
+          <span class="sm:hidden">Nhập lô</span>
+        </button>
+
+        <!-- SINGLE PRIMARY CTA ON PAGE (Rule I3) -->
+        <button
+          type="button"
+          id="btn-open-export-modal"
+          title="Xem và sao chép tóm tắt báo cáo hoặc xuất CSV"
+          class="h-9 px-2.5 sm:px-3.5 rounded-lg btn-primary text-xs font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <svg class="w-3.5 h-3.5 shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="hidden sm:inline">Xuất báo cáo</span>
+          <span class="sm:hidden">Báo cáo</span>
+        </button>
+
+        <!-- Dark/Light Theme Toggle (36x36px, text-xs for uniform header button rule) -->
+        <button
+          type="button"
+          id="btn-toggle-theme"
+          title="Chuyển đổi giao diện Sáng / Tối"
+          aria-label="Chuyển đổi giao diện Sáng / Tối"
+          class="w-9 h-9 text-xs rounded-lg btn-secondary inline-flex items-center justify-center text-muted hover:text-foreground shrink-0"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <!-- ========================================================================
+       MAIN EXECUTIVE WORKSPACE (Phương án A — Chẩn đoán & Quyết định)
+       ======================================================================== -->
+  <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 py-5 space-y-6">
 
-    <!-- HERO: KẾT LUẬN NHANH (kiểu Executive / Triple Whale summary bar) -->
-    <section id="hero-summary" data-tone="neutral" class="relative overflow-hidden rounded-2xl p-5 sm:p-6 text-white bg-gradient-to-br from-slate-900 via-indigo-950 to-indigo-800 border border-indigo-900/40 shadow-lg">
-      <div class="hero-glow pointer-events-none absolute -top-16 -right-10 w-72 h-72 rounded-full blur-3xl"></div>
-      <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-bold uppercase tracking-widest text-indigo-200">
-            <span>Kết luận nhanh</span>
-            <span class="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-semibold normal-case tracking-normal text-indigo-100">tính theo quy tắc</span>
-            <span id="hero-period" class="font-medium normal-case tracking-normal text-indigo-300/80"></span>
+    <!-- ======================================================================
+         KHỐI 2: EXECUTIVE VERDICT STRIP + 4-METRIC FUNNEL KPI STRIP
+         ====================================================================== -->
+    <div class="bg-surface rounded-xl border border-border overflow-hidden">
+      
+      <!-- Executive Verdict Banner (#hero-summary) -->
+      <section id="hero-summary" class="hero-neutral px-4 sm:px-6 py-3.5 border-b border-border flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div class="space-y-1 min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="hero-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold status-pill-neutral">
+              Tổng quan kỳ
+            </span>
+            <span id="hero-period" class="text-xs text-muted font-medium tabular-nums"></span>
           </div>
-          <h2 id="hero-headline" class="mt-2 text-xl sm:text-2xl font-extrabold leading-snug">Chưa có số liệu chiến dịch</h2>
-          <p id="hero-sub" class="mt-1.5 text-xs sm:text-sm text-indigo-200/90 leading-relaxed max-w-3xl"></p>
-        </div>
-        <a id="hero-cta" href="#section-ai" class="shrink-0 inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 transition">Xem phân tích &amp; 3 gợi ý ↓</a>
-      </div>
-    </section>
-
-    <!-- SECTION 1: KPI SUMMARY CARDS (Top Overview) -->
-    <section id="section-kpis">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-        <!-- Card 1: Total Spend -->
-        <div class="kpi-card border-t-2 border-t-indigo-500 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tổng Chi Phí</span>
-            <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-          </div>
-          <div class="mt-3">
-            <div class="flex items-baseline justify-between gap-2"><h3 id="kpi-total-cost" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">0 ₫</h3><span id="badge-cost-delta"></span></div>
-            <div id="spark-cost" class="kpi-spark mt-3 h-8"></div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span class="text-xs text-slate-500 dark:text-slate-400">CPC trung bình:</span>
-              <span id="kpi-avg-cpc" class="text-xs font-bold text-slate-700 dark:text-slate-300">0 ₫</span>
-            </div>
-          </div>
+          <h2 id="hero-headline" class="text-base sm:text-lg font-bold tracking-tight text-foreground">
+            Chưa có số liệu chiến&nbsp;dịch
+          </h2>
+          <p id="hero-sub" class="text-xs sm:text-sm text-muted leading-relaxed">
+            Nhập số liệu ngày đầu tiên ở bảng bên dưới hoặc nạp mẫu 14 ngày để xem chẩn đoán&nbsp;phễu.
+          </p>
         </div>
 
-        <!-- Card 2: Total Reach -->
-        <div class="kpi-card border-t-2 border-t-cyan-500 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tiếp Cận (Reach)</span>
-            <div class="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-950/60 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            </div>
-          </div>
-          <div class="mt-3">
-            <div class="flex items-baseline justify-between gap-2"><h3 id="kpi-total-reach" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">0</h3><span id="badge-reach-delta"></span></div>
-            <div id="spark-reach" class="kpi-spark mt-3 h-8"></div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span class="text-xs text-slate-500 dark:text-slate-400">Tổng Clicks:</span>
-              <span id="kpi-total-clicks" class="text-xs font-bold text-cyan-600 dark:text-cyan-400">0</span>
-            </div>
-          </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a
+            href="#section-data-management"
+            id="hero-cta"
+            class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <span id="hero-cta-text">Nhập dữ liệu ngay</span>
+            <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </a>
         </div>
+      </section>
 
-        <!-- Card 3: Click/reach (Click-Through Rate) -->
-        <div class="kpi-card border-t-2 border-t-emerald-500 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tỷ Lệ Nhấp (Click/reach)</span>
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
-            </div>
-          </div>
-          <div class="mt-3">
-            <div class="flex items-baseline space-x-2">
-              <h3 id="kpi-avg-ctr" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">0.00%</h3>
-              <span id="badge-ctr-delta"></span>
-            </div>
-            <div id="spark-ctr" class="kpi-spark mt-3 h-8"></div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span class="text-xs text-slate-500 dark:text-slate-400">Tỷ lệ chuyển đổi (CVR):</span>
-              <span id="kpi-avg-cvr" class="text-xs font-bold text-emerald-600 dark:text-emerald-400">0.00%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4: Orders & CPA -->
-        <div class="kpi-card border-t-2 border-t-amber-500 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tổng Đơn & CPA</span>
-            <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-            </div>
-          </div>
-          <div class="mt-3">
-            <div class="flex items-baseline justify-between">
-              <h3 id="kpi-total-orders" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">0 đơn</h3>
-              <span id="badge-orders-delta"></span>
-            </div>
-            <div id="spark-orders" class="kpi-spark mt-3 h-8"></div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <span class="text-xs text-slate-500 dark:text-slate-400">Chi phí / Đơn (CPA):</span>
-              <span class="flex items-center gap-1.5"><span id="kpi-cpa-delta"></span><span id="kpi-avg-cpa" class="text-xs font-black text-amber-600 dark:text-amber-400">0 ₫</span></span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- KHU VỰC NHẬP LIỆU: FORM TỪNG NGÀY & BẢNG SỐ LIỆU CHI TIẾT -->
-    <div id="section-data-management" class="space-y-6">
-
-      <!-- LEFT: Form nhập nhanh từng ngày (4 cols on desktop) -->
-      <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center">
-              <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-              Nhập Số Liệu Theo Ngày
-            </h3>
-            <button id="btn-cancel-edit" type="button" onclick="cancelEdit()" class="hidden text-xs text-rose-500 hover:underline">Hủy sửa</button>
-          </div>
-
-          <form id="single-entry-form" class="mt-4 grid grid-cols-2 lg:grid-cols-6 gap-3 items-end">
-            <!-- Date -->
-            <div class="col-span-2 lg:col-span-1">
-              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Ngày chạy quảng cáo</label>
-              <input id="input-date" type="date" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" />
-            </div>
-
-            <!-- Reach & Clicks -->
-            <div class="contents">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tiếp cận (Reach)</label>
-                <input id="input-reach" type="number" min="0" placeholder="VD: 25000" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Lượt nhấp (Clicks)</label>
-                <input id="input-clicks" type="number" min="0" placeholder="VD: 650" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" />
-              </div>
-            </div>
-
-            <!-- Cost & Orders -->
-            <div class="contents">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Chi phí (VNĐ)</label>
-                <input id="input-cost" type="number" min="0" step="1000" placeholder="VD: 1500000" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Số đơn hàng</label>
-                <input id="input-orders" type="number" min="0" placeholder="VD: 24" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" />
-              </div>
-            </div>
-
-            <div class="col-span-2 lg:col-span-1">
-              <button id="btn-submit-single" type="submit" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-md shadow-indigo-500/20 transition flex items-center justify-center">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Lưu Số Liệu Ngày
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Quick tips for marketer -->
-        <div class="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50 text-[11px] text-slate-500 dark:text-slate-400">
-          <span class="font-semibold text-indigo-600 dark:text-indigo-400">💡 Lưu ý:</span>
-          Dữ liệu được lưu vĩnh viễn trong trình duyệt (localStorage). Các chỉ số Click/reach, CPC, CPA sẽ tự động tính ngay sau khi bấm lưu!
-        </div>
-      </div>
-
-      <!-- RIGHT: Bảng Lịch Sử Dữ Liệu & Thao Tác (8 cols on desktop) -->
-      <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center">
-              <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-              Chi Tiết Số Liệu Từng Ngày & Chỉ Số Tự Động Tính
-            </h3>
-
-            <!-- Data Table Actions -->
-            <div class="flex flex-wrap items-center gap-2">
-              <!-- Template Download Dropdown -->
-              <div class="relative inline-block text-left" id="template-dropdown-wrapper">
-                <button id="btn-toggle-template-menu" type="button" onclick="toggleTemplateMenu(event)" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-lg text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition" title="Tải file mẫu để điền số liệu (Excel, Word, PDF)">
-                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                  Tải file mẫu
-                  <svg class="w-3 h-3 ml-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div id="template-dropdown-menu" class="hidden absolute left-0 sm:left-auto sm:right-0 mt-1 w-64 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 z-50 text-xs">
-                  <div class="px-3 py-1 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tải file mẫu để điền:</div>
-                  <a href="/api/template?type=xlsx" download="mau_kpi_chien_dich.xlsx" class="flex items-center px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
-                    <span class="mr-2 text-base">📗</span>
-                    <div><div class="font-bold text-emerald-600 dark:text-emerald-400">Mẫu Excel (.xlsx)</div><div class="text-[10px] text-slate-400">Chuẩn bảng tính, dễ nhập dữ liệu</div></div>
-                  </a>
-                  <a href="/api/template?type=docx" download="mau_kpi_chien_dich.docx" class="flex items-center px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
-                    <span class="mr-2 text-base">📄</span>
-                    <div><div class="font-bold text-blue-600 dark:text-blue-400">Mẫu Word (.docx)</div><div class="text-[10px] text-slate-400">Bảng biểu tài liệu Microsoft Word</div></div>
-                  </a>
-                  <a href="/api/template?type=pdf" download="mau_kpi_chien_dich.pdf" class="flex items-center px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition">
-                    <span class="mr-2 text-base">📑</span>
-                    <div><div class="font-bold text-rose-600 dark:text-rose-400">Mẫu PDF (.pdf)</div><div class="text-[10px] text-slate-400">Định dạng văn bản / báo cáo PDF</div></div>
-                  </a>
-                  <a href="/api/template?type=csv" download="mau_kpi_chien_dich.csv" class="flex items-center px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition border-t border-slate-100 dark:border-slate-700">
-                    <span class="mr-2 text-base">📝</span>
-                    <div><div class="font-bold text-amber-600 dark:text-amber-400">Mẫu CSV (.csv)</div><div class="text-[10px] text-slate-400">Dữ liệu dạng văn bản nhẹ</div></div>
-                  </a>
+      <!-- 4-Metric Funnel KPI Strip (Cost -> Reach -> CTR -> Orders & CPA) -->
+      <section aria-label="Chỉ số hiệu suất chính" id="section-kpis" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
+        
+        <!-- 1. TỔNG CHI PHÍ (cat-1: Blue) -->
+        <div class="kpi-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-semibold text-muted">Tổng chi phí</span>
+              <div class="flex items-center gap-1.5">
+                <span id="badge-cost-delta"></span>
+                <div class="w-7 h-7 rounded-lg cat-badge-1 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </div>
               </div>
-
-              <!-- Unified File Import for Excel, Word, PDF, Image OCR -->
-              <label class="cursor-pointer inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-lg text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 transition shadow-sm" title="Nhập dữ liệu tự động từ file Excel, Word, PDF hoặc Ảnh chụp màn hình (hỗ trợ cả dán ảnh Ctrl+V)">
-                <svg id="icon-import-idle" class="w-3.5 h-3.5 mr-1 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"></path></svg>
-                <svg id="icon-import-loading" class="hidden w-3.5 h-3.5 mr-1 text-emerald-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                <span id="label-import-text">Nhập File / Ảnh OCR</span>
-                <input id="campaign-file-input" type="file" accept=".xlsx,.xls,.csv,.docx,.doc,.pdf,.png,.jpg,.jpeg,.webp,.bmp" class="hidden" onchange="handleCampaignFileSelect(event)" />
-              </label>
-
-              <!-- Export CSV -->
-              <button onclick="exportToCsv()" class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Xuất dữ liệu ra file CSV">
-                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Xuất CSV
-              </button>
-
-              <!-- Clear all -->
-              <button id="btn-clear-all" type="button" onclick="clearAllData(event)" class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition" title="Xóa toàn bộ số liệu">
-                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                Xóa hết
-              </button>
+            </div>
+            <div id="kpi-total-cost" class="text-xl sm:text-2xl font-bold tracking-tight text-foreground tabular-nums whitespace-nowrap">
+              0 ₫
             </div>
           </div>
+          <div class="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
+            <span class="text-xs text-muted font-medium tabular-nums truncate">CPC: <strong id="kpi-avg-cpc" class="font-semibold text-foreground">--</strong></span>
+            <div id="spark-cost" class="sparkline-container w-16 h-6 shrink-0"></div>
+          </div>
+        </div>
 
-          <!-- Table Container with Horizontal Scroll -->
-          <div class="mt-3 rounded-xl border border-slate-100 dark:border-slate-800">
-            <table class="responsive-table w-full text-left text-xs">
-              <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200/80 dark:border-slate-800">
-                <tr>
-                  <th class="py-3 px-2.5">Ngày</th>
-                  <th class="py-3 px-2.5 text-right">Reach</th>
-                  <th class="py-3 px-2.5 text-right">Clicks</th>
-                  <th class="py-3 px-2.5 text-right">Chi phí</th>
-                  <th class="py-3 px-2.5 text-right">Đơn</th>
-                  <th class="py-3 px-2.5 text-right">Click/reach</th>
-                  <th class="py-3 px-2.5 text-right">CPC</th>
-                  <th class="py-3 px-2.5 text-right">Chi phí/đơn (CPA)</th>
-                  <th class="py-3 px-2.5 text-center">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="data-table-body">
-                <!-- Injected by JS -->
-              </tbody>
-            </table>
-
-            <!-- Empty State -->
-            <div id="table-empty-state" class="hidden py-12 text-center">
-              <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-              <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Chưa có số liệu chiến dịch</p>
-              <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-md mx-auto mb-4">
-                Bạn có thể tải file mẫu để điền (Excel, Word, PDF), nhập file có sẵn, hoặc bấm nạp nhanh 14 ngày mẫu để trải nghiệm.
-              </p>
-              <div class="flex flex-wrap items-center justify-center gap-2">
-                <button type="button" onclick="loadSampleDataAction()" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition">
-                  <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                  Nạp mẫu ngẫu nhiên
-                </button>
-
-                <label class="cursor-pointer inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 transition">
-                  <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"></path></svg>
-                  Nhập File (Excel / Word / PDF)
-                  <input type="file" accept=".xlsx,.xls,.csv,.docx,.doc,.pdf" class="hidden" onchange="handleCampaignFileSelect(event)" />
-                </label>
-
-                <a href="/api/template?type=xlsx" download="mau_kpi_chien_dich.xlsx" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                  <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                  Tải file mẫu Excel (.xlsx)
-                </a>
+        <!-- 2. LƯỢT TIẾP CẬN (cat-2: Teal) -->
+        <div class="kpi-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-semibold text-muted">Lượt tiếp cận (Reach)</span>
+              <div class="flex items-center gap-1.5">
+                <span id="badge-reach-delta"></span>
+                <div class="w-7 h-7 rounded-lg cat-badge-2 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
               </div>
+            </div>
+            <div id="kpi-total-reach" class="text-xl sm:text-2xl font-bold tracking-tight text-foreground tabular-nums whitespace-nowrap">
+              0
+            </div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
+            <span class="text-xs text-muted font-medium tabular-nums truncate">Nhấp: <strong id="kpi-total-clicks" class="font-semibold text-foreground">0</strong></span>
+            <div id="spark-reach" class="sparkline-container w-16 h-6 shrink-0"></div>
+          </div>
+        </div>
+
+        <!-- 3. TỶ LỆ NHẤP CTR (cat-3: Violet) -->
+        <div class="kpi-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-semibold text-muted">Tỷ lệ Click/reach</span>
+              <div class="flex items-center gap-1.5">
+                <span id="badge-ctr-delta"></span>
+                <div class="w-7 h-7 rounded-lg cat-badge-3 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div id="kpi-avg-ctr" class="text-xl sm:text-2xl font-bold tracking-tight text-foreground tabular-nums whitespace-nowrap">
+              --
+            </div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
+            <span class="text-xs text-muted font-medium tabular-nums truncate">CVR: <strong id="kpi-avg-cvr" class="font-semibold text-foreground">--</strong></span>
+            <div id="spark-ctr" class="sparkline-container w-16 h-6 shrink-0"></div>
+          </div>
+        </div>
+
+        <!-- 4. TỔNG ĐƠN HÀNG & CPA (cat-4: Fuchsia) -->
+        <div class="kpi-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-semibold text-muted">Đơn hàng &amp; CPA</span>
+              <div class="flex items-center gap-1.5">
+                <span id="badge-orders-delta"></span>
+                <div class="w-7 h-7 rounded-lg cat-badge-4 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div id="kpi-total-orders" class="text-xl sm:text-2xl font-bold tracking-tight text-foreground tabular-nums whitespace-nowrap">
+              0 đơn
+            </div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 min-w-0 truncate">
+              <span class="text-xs text-muted font-medium">CPA:</span>
+              <strong id="kpi-avg-cpa" class="text-xs font-semibold text-foreground tabular-nums truncate">--</strong>
+              <span id="kpi-cpa-delta" class="hidden xl:inline"></span>
+            </div>
+            <div id="spark-orders" class="sparkline-container w-16 h-6 shrink-0"></div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- ======================================================================
+         KHỐI 3 & 4: EXECUTIVE WORKSPACE 2-COLUMN SPLIT (7 COLS CHART / 5 COLS AI)
+         ====================================================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- KHỐI 3: BIỂU ĐỒ XU HƯỚNG THEO NGÀY (7/12 Cols) -->
+      <section id="section-chart" class="lg:col-span-7 bg-surface rounded-xl border border-border flex flex-col overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <h2 class="text-base font-semibold text-foreground break-words">Biểu đồ xu hướng theo&nbsp;ngày</h2>
+            <p class="text-xs text-muted mt-0.5">Đối chiếu tương quan giữa quy mô chi tiêu và hiệu quả chuyển&nbsp;đổi.</p>
+          </div>
+
+          <!-- Chart Controls -->
+          <div class="flex items-center gap-2 shrink-0">
+            <label for="chart-metric-select" class="sr-only">Chế độ chỉ số biểu đồ</label>
+            <select
+              id="chart-metric-select"
+              class="h-9 px-2.5 text-xs font-medium rounded-lg border border-border-strong bg-surface text-foreground cursor-pointer"
+            >
+              <option value="all">Tổng hợp (Chi phí, Reach, Đơn)</option>
+              <option value="cost_orders">Chi phí (₫) &amp; Đơn hàng</option>
+              <option value="reach_clicks">Lượt tiếp cận &amp; Lượt nhấp</option>
+              <option value="efficiency">Hiệu suất (Click/reach &amp; CPA)</option>
+            </select>
+
+            <label for="chart-type-select" class="sr-only">Kiểu biểu đồ</label>
+            <select
+              id="chart-type-select"
+              class="h-9 px-2.5 text-xs font-medium rounded-lg border border-border-strong bg-surface text-foreground cursor-pointer"
+            >
+              <option value="combo">Cột + Đường</option>
+              <option value="line">Biểu đồ Đường</option>
+              <option value="bar">Biểu đồ Cột</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chart Canvas Area -->
+        <div class="p-4 sm:p-5 relative min-h-[340px] flex flex-col justify-center">
+          <div id="chart-empty-state" class="inset-0 flex flex-col items-center justify-center text-center p-6">
+            <div class="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-muted mb-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-foreground">Chưa có dữ liệu biểu&nbsp;đồ</p>
+            <p class="text-xs text-muted mt-1 max-w-xs">
+              Thêm số liệu theo ngày ở bảng bên dưới hoặc nạp mẫu 14 ngày để trực quan&nbsp;hóa.
+            </p>
+          </div>
+          <div class="w-full h-[320px] sm:h-[340px]">
+            <canvas id="campaign-chart-canvas" class="hidden"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- KHỐI 4: TRỢ LÝ PHÂN TÍCH & KHUYẾN NGHỊ TỐI ƯU (5/12 Cols) -->
+      <section id="section-ai" class="lg:col-span-5 bg-surface rounded-xl border border-border flex flex-col overflow-hidden">
+        
+        <!-- Panel Header & Period Controls -->
+        <div class="p-4 sm:p-5 border-b border-border flex flex-col gap-3">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-semibold text-foreground break-words">Chẩn đoán &amp; Khuyến&nbsp;nghị</h2>
+              </div>
+              <p class="text-xs text-muted mt-0.5">
+                Phân rã phễu <span class="font-mono font-semibold text-foreground whitespace-nowrap">CPA = CPC ÷ CVR</span> giữa 2&nbsp;kỳ.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="btn-run-gemini-ai"
+              onclick="runGeminiAiAnalysis()"
+              title="Phân tích chuyên sâu bằng AI"
+              class="h-8 px-2.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+            >
+              <svg id="gemini-btn-icon" class="w-3.5 h-3.5 text-primary-token" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span id="gemini-btn-text">AI hỗ trợ cải thiện</span>
+            </button>
+          </div>
+
+          <!-- Comparison Window & Noise Threshold -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div class="flex items-center justify-between gap-1.5 bg-app px-2.5 py-1.5 rounded-lg border border-border">
+              <label for="analysis-days" class="text-xs font-medium text-muted whitespace-nowrap">Kỳ so sánh</label>
+              <select
+                id="analysis-days"
+                onchange="onAnalysisPeriodChange()"
+                class="h-8 px-1.5 text-xs font-semibold rounded border border-border-strong bg-surface text-foreground cursor-pointer"
+              >
+                <option value="7" selected>7 ngày</option>
+                <option value="14">14 ngày</option>
+                <option value="3">3 ngày</option>
+                <option value="1">1 ngày</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between gap-1.5 bg-app px-2.5 py-1.5 rounded-lg border border-border">
+              <label for="analysis-threshold" class="text-xs font-medium text-muted whitespace-nowrap">Ngưỡng nhiễu</label>
+              <select
+                id="analysis-threshold"
+                onchange="onAnalysisPeriodChange()"
+                class="h-8 px-1.5 text-xs font-semibold rounded border border-border-strong bg-surface text-foreground cursor-pointer"
+              >
+                <option value="5" selected>±5%</option>
+                <option value="0">0%</option>
+                <option value="3">±3%</option>
+                <option value="10">±10%</option>
+              </select>
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Panel Body: Verdict Status + Funnel Evidence + 3 Recommendations + AI Q&A -->
+        <div class="p-4 sm:p-5 space-y-4">
+          
+          <!-- Verdict Status Header + Trend Summary -->
+          <div class="space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-muted whitespace-nowrap">Kết luận quy&nbsp;tắc</span>
+              <span id="ai-status-label" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-secondary text-muted whitespace-nowrap shrink-0">
+                Chờ dữ liệu chiến&nbsp;dịch
+              </span>
+            </div>
+            <div id="ai-trend-badges" class="hidden"></div>
+            <div id="ai-trend-summary" class="text-xs text-foreground leading-relaxed"></div>
+          </div>
+
+          <!-- 3 Actionable Recommendations List -->
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-muted break-words">03 Khuyến nghị hành&nbsp;động</h3>
+              <span class="text-xs text-muted whitespace-nowrap">Theo tác&nbsp;động</span>
+            </div>
+            <div id="ai-recommendations-list" class="space-y-2">
+              <!-- Populated dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- Grounded AI Chat Assistant -->
+          <div class="pt-3 border-t border-border space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-foreground whitespace-nowrap">Hỏi đáp trực tiếp trên số&nbsp;liệu</span>
+              <span id="ai-cache-indicator" class="text-xs text-muted whitespace-nowrap">Đối chiếu thực&nbsp;tế</span>
+            </div>
+
+            <!-- Quick Question Chips (3 equal columns, h-8 >= 32px, no horizontal scroll) -->
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" onclick="askAiQuestion('Vì sao CPA biến động?')" class="h-8 px-1.5 inline-flex items-center justify-center text-xs rounded-lg btn-subtle font-medium whitespace-nowrap">
+                Vì sao CPA?
+              </button>
+              <button type="button" onclick="askAiQuestion('Ngày nào hiệu quả nhất?')" class="h-8 px-1.5 inline-flex items-center justify-center text-xs rounded-lg btn-subtle font-medium whitespace-nowrap">
+                Ngày tốt nhất?
+              </button>
+              <button type="button" onclick="askAiQuestion('Ưu tiên hành động nào?')" class="h-8 px-1.5 inline-flex items-center justify-center text-xs rounded-lg btn-subtle font-medium whitespace-nowrap">
+                Ưu tiên gì?
+              </button>
+            </div>
+
+            <!-- Chat Thread -->
+            <div id="ai-chat-thread" class="hidden max-h-60 overflow-y-auto space-y-2.5 p-3 rounded-lg bg-app border border-border"></div>
+
+            <!-- Question Controls -->
+            <div class="flex items-center gap-2">
+              <label for="ai-chat-input" class="sr-only">Câu hỏi cho AI</label>
+              <input
+                type="text"
+                id="ai-chat-input"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();submitAiQuestion();}"
+                placeholder="Hỏi AI về số liệu chiến dịch..."
+                class="flex-1 h-9 px-3 text-xs rounded-lg bg-surface border border-border-strong text-foreground"
+              />
+              <button
+                type="button"
+                id="btn-submit-ai-chat"
+                onclick="submitAiQuestion()"
+                class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-semibold inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+              >
+                <span id="ai-chat-btn-text">Gửi câu hỏi</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
 
     </div>
 
-  
-    <!-- ĐỐNG PHÂN TÍCH & BIỂU ĐỒ (HIỂN THỊ PHÍA DƯỚI INFO NHẬP VÀO) -->
-    <!-- SECTION 2: BIỂU ĐỒ HIỆU SUẤT THEO NGÀY (Chart.js - Only visible when data exists) -->
-    <section id="section-chart" class="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-        <div>
-          <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
-            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            Biểu Đồ Xu Hướng Chiến Dịch Theo Ngày
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Theo dõi trực quan mối tương quan giữa Tiếp cận (Reach), Ngân sách và Đơn hàng thực tế.</p>
-        </div>
-
-        <!-- Chart Controls -->
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- View Metric mode -->
-          <select id="chart-metric-select" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-            <option value="all">Tổng quan Đa trục (Reach, Chi phí, Đơn)</option>
-            <option value="cost_orders">Chi phí vs Đơn hàng</option>
-            <option value="reach_clicks">Phễu Tiếp cận (Reach vs Clicks)</option>
-            <option value="efficiency">Chỉ số Hiệu quả (Click/reach vs CPA)</option>
-          </select>
-
-          <!-- Chart Type -->
-          <select id="chart-type-select" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-            <option value="combo">Kết hợp (Cột + Đường)</option>
-            <option value="line">Biểu đồ Đường (Line)</option>
-            <option value="bar">Biểu đồ Cột (Bar)</option>
-          </select>
-
-          <!-- Range filter -->
-          <select id="filter-range-select" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-            <option value="all">Toàn bộ thời gian</option>
-            <option value="14days">14 ngày gần nhất</option>
-            <option value="7days">7 ngày gần nhất</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Chart Container -->
-      <div class="mt-4 chart-container relative">
-        <canvas id="campaign-chart-canvas"></canvas>
-        <div id="chart-empty-state" class="hidden flex-col items-center justify-center h-full text-center p-6 border-2 border-dashed border-slate-200 dark:border-slate-700/60 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30">
-          <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 dark:text-indigo-400 flex items-center justify-center mb-3 shadow-sm">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-          </div>
-          <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Chưa có dữ liệu chiến dịch để vẽ biểu đồ</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1 mb-4 leading-relaxed">
-            Bạn có thể nhập số liệu thực tế ở bảng bên dưới hoặc bấm nút nạp 14 ngày mẫu để trải nghiệm đầy đủ các tính năng.
-          </p>
+    <!-- ======================================================================
+         KHỐI 5: CAMPAIGN DATA LEDGER + INLINE QUICK-ENTRY BAR (Full Width)
+         ====================================================================== -->
+    <section id="section-data-management" class="bg-surface rounded-xl border border-border overflow-hidden">
+      
+      <!-- Ledger Header & File / Filter Toolbar -->
+      <div class="p-4 sm:p-5 border-b border-border flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+        <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2.5">
-            <button type="button" onclick="loadSampleDataAction()" class="inline-flex items-center px-3.5 py-2 text-xs font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition">
-              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-              Nạp mẫu ngẫu nhiên
-            </button>
-            <button type="button" onclick="openBulkModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 transition">
-              Nhập nhiều dòng
-            </button>
+            <h2 class="text-base font-semibold text-foreground break-words">Sổ cái dữ liệu chiến&nbsp;dịch</h2>
           </div>
+          <p class="text-xs text-muted mt-0.5">
+            Nhập trực tiếp bên dưới, tải lên tệp báo cáo (Excel, Word, PDF, CSV, Ảnh) hoặc bấm vào dòng bất kỳ để chỉnh&nbsp;sửa.
+          </p>
+        </div>
+
+        <!-- Secondary Actions: Template Download, File Import, Range Filter, Clear -->
+        <div class="grid grid-cols-2 sm:flex sm:flex-nowrap items-center gap-2">
+          
+          <!-- Template Download Dropdown (First on left so left-0 never overflows on 375px) -->
+          <div class="relative" id="template-dropdown-wrapper">
+            <button
+              type="button"
+              id="btn-toggle-template-menu"
+              onclick="toggleTemplateMenu(event)"
+              title="Tải tệp mẫu chuẩn để điền số liệu"
+              class="w-full sm:w-auto h-8 px-2.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+            >
+              <svg class="w-3.5 h-3.5 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Tải mẫu chuẩn</span>
+              <svg class="w-3 h-3 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div
+              id="template-dropdown-menu"
+              class="absolute left-0 top-full mt-1 w-48 bg-surface-overlay rounded-xl shadow-popover border border-border py-1 hidden z-30"
+            >
+              <div class="px-3 py-1.5 text-xs font-semibold text-muted border-b border-border">
+                Mẫu chuẩn (7&nbsp;ngày)
+              </div>
+              <a href="/api/template?type=xlsx" download class="flex items-center justify-between px-3 py-2 text-xs text-foreground hover:bg-item-hover">
+                <span class="font-medium">Mẫu Excel (.xlsx)</span>
+                <span class="text-xs text-muted">Chuẩn</span>
+              </a>
+              <a href="/api/template?type=docx" download class="flex items-center justify-between px-3 py-2 text-xs text-foreground hover:bg-item-hover">
+                <span class="font-medium">Mẫu Word (.docx)</span>
+                <span class="text-xs text-muted">Bảng</span>
+              </a>
+              <a href="/api/template?type=pdf" download class="flex items-center justify-between px-3 py-2 text-xs text-foreground hover:bg-item-hover">
+                <span class="font-medium">Mẫu PDF (.pdf)</span>
+                <span class="text-xs text-muted">Vector</span>
+              </a>
+              <a href="/api/template?type=csv" download class="flex items-center justify-between px-3 py-2 text-xs text-foreground hover:bg-item-hover">
+                <span class="font-medium">Mẫu CSV (.csv)</span>
+                <span class="text-xs text-muted">UTF-8</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Multimodal File Upload -->
+          <input
+            type="file"
+            id="campaign-file-input"
+            onchange="handleCampaignFileSelect(event)"
+            accept=".xlsx,.xls,.docx,.doc,.pdf,.csv,.png,.jpg,.jpeg,.webp"
+            class="hidden"
+          />
+          <label
+            for="campaign-file-input"
+            id="btn-import-file-label"
+            title="Nhập tự động từ Excel (.xlsx), Word (.docx), PDF (.pdf), CSV hoặc Ảnh chụp màn hình"
+            class="w-full sm:w-auto h-8 px-2.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+          >
+            <svg id="icon-import-idle" class="w-3.5 h-3.5 text-primary-token shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <svg id="icon-import-loading" class="w-3.5 h-3.5 text-primary-token shrink-0 animate-spin hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span id="label-import-text">Nhập tệp / Ảnh</span>
+          </label>
+
+          <!-- Date Range Filter -->
+          <label for="filter-range-select" class="sr-only">Lọc theo kỳ</label>
+          <select
+            id="filter-range-select"
+            class="w-full sm:w-auto h-8 px-2.5 text-xs font-medium rounded-lg border border-border-strong bg-surface text-foreground cursor-pointer"
+          >
+            <option value="all">Tất cả ngày</option>
+            <option value="7days">7 ngày gần nhất</option>
+            <option value="14days">14 ngày gần nhất</option>
+          </select>
+
+          <!-- Clear All Button -->
+          <button
+            type="button"
+            id="btn-clear-all"
+            title="Xóa toàn bộ dữ liệu"
+            class="w-full sm:w-auto h-8 px-2.5 text-xs font-medium rounded-lg btn-secondary text-rose-600 dark:text-rose-400 inline-flex items-center justify-center gap-1 whitespace-nowrap"
+          >
+            <span>Xóa hết</span>
+          </button>
         </div>
       </div>
-    </section>
 
-    <!-- SECTION 3: AI NHẬN XÉT XU HƯỚNG & 03 GỢI Ý CẢI THIỆN CHIẾN DỊCH (Only visible when data exists) -->
-    <section id="section-ai" class="bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/50 dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 p-5 sm:p-6 rounded-2xl border border-indigo-100 dark:border-indigo-950/80 shadow-sm relative overflow-hidden">
-      <!-- Glow Accent -->
-      <div class="absolute top-0 right-0 -mt-12 -mr-12 w-48 h-48 rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-3xl pointer-events-none"></div>
-
-      <!-- Header AI section -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-indigo-100/80 dark:border-slate-800">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <!-- INLINE QUICK-ENTRY BAR (Horizontal Bar right above Table — Phương án A) -->
+      <div class="p-4 sm:px-5 bg-app border-b border-border-strong">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-foreground">
+              Thêm / Cập nhật số liệu&nbsp;ngày
+            </span>
           </div>
-          <div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center">
-              Đánh giá hiệu quả & 03 gợi ý cải thiện
-              <span class="ml-2 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">Automated</span>
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Tự động phân tích đường xu hướng tăng/giảm và đưa ra 03 hành động cải thiện chiến dịch.</p>
-          </div>
-        </div>
-
-        <!-- Health Score Badge & Gemini Trigger -->
-        <div class="flex items-center space-x-3">
-          <button id="btn-run-gemini-ai" type="button" onclick="runGeminiAiAnalysis()" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-md shadow-indigo-500/25 transition transform active:scale-95">
-            <svg id="gemini-btn-icon" class="w-4 h-4 mr-1.5 text-amber-300 animate-spin-slow" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
-            <span id="gemini-btn-text">AI hỗ trợ cải thiện</span>
-          </button>
-
-          <span id="ai-status-label" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
-            Đang đánh giá...
+          <span class="text-xs text-muted hidden sm:inline">
+            Tự động tính <span class="font-mono font-semibold text-foreground">Click/reach, CPC, CVR, CPA</span> ngay khi&nbsp;lưu
           </span>
         </div>
+
+        <form id="single-entry-form" novalidate class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-end">
+          
+          <!-- Date Input -->
+          <div class="lg:col-span-2">
+            <label for="input-date" class="block text-xs font-medium text-muted mb-1">
+              Ngày chạy <span class="text-rose-700 dark:text-rose-400">*</span>
+            </label>
+            <input
+              type="text"
+              inputmode="numeric"
+              placeholder="YYYY-MM-DD"
+              id="input-date"
+              required
+              class="w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground font-mono tabular-nums"
+            />
+          </div>
+
+          <!-- Reach Input -->
+          <div class="lg:col-span-2">
+            <label for="input-reach" class="block text-xs font-medium text-muted mb-1">
+              Lượt tiếp cận <span class="text-rose-700 dark:text-rose-400">*</span>
+            </label>
+            <input
+              type="number"
+              id="input-reach"
+              min="0"
+              step="1"
+              placeholder="VD: 15000"
+              required
+              class="w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground font-mono tabular-nums"
+            />
+          </div>
+
+          <!-- Clicks Input -->
+          <div class="lg:col-span-2">
+            <label for="input-clicks" class="block text-xs font-medium text-muted mb-1">
+              Lượt nhấp <span class="text-rose-700 dark:text-rose-400">*</span>
+            </label>
+            <input
+              type="number"
+              id="input-clicks"
+              min="0"
+              step="1"
+              placeholder="VD: 450"
+              required
+              class="w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground font-mono tabular-nums"
+            />
+          </div>
+
+          <!-- Cost Input -->
+          <div class="lg:col-span-2">
+            <label for="input-cost" class="block text-xs font-medium text-muted mb-1">
+              Chi phí (₫) <span class="text-rose-700 dark:text-rose-400">*</span>
+            </label>
+            <input
+              type="number"
+              id="input-cost"
+              min="0"
+              step="1000"
+              placeholder="VD: 1200000"
+              required
+              class="w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground font-mono tabular-nums"
+            />
+          </div>
+
+          <!-- Orders Input -->
+          <div class="lg:col-span-2">
+            <label for="input-orders" class="block text-xs font-medium text-muted mb-1">
+              Đơn hàng <span class="text-rose-700 dark:text-rose-400">*</span>
+            </label>
+            <input
+              type="number"
+              id="input-orders"
+              min="0"
+              step="1"
+              placeholder="VD: 25"
+              required
+              class="w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground font-mono tabular-nums"
+            />
+          </div>
+
+          <!-- Submit & Cancel Edit Buttons -->
+          <div class="sm:col-span-2 lg:col-span-2 flex items-center gap-1.5">
+            <button
+              type="submit"
+              id="btn-submit-single"
+              class="w-full h-9 px-3 rounded-lg btn-subtle font-semibold text-xs inline-flex items-center justify-center gap-1.5 border border-border-strong whitespace-nowrap"
+            >
+              <svg class="w-3.5 h-3.5 text-primary-token shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Lưu số liệu ngày</span>
+            </button>
+
+            <button
+              type="button"
+              id="btn-cancel-edit"
+              onclick="cancelEdit()"
+              class="hidden h-9 px-2.5 rounded-lg btn-secondary text-xs font-medium shrink-0"
+            >
+              Hủy
+            </button>
+          </div>
+        </form>
       </div>
 
-      <div class="my-3.5 flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/40 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
-        <label class="flex items-center space-x-1.5 font-medium">
-          <span>Kỳ so sánh:</span>
-          <select id="analysis-days" onchange="onAnalysisPeriodChange()" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-            <option value="7">7 ngày gần nhất</option>
-            <option value="14">14 ngày gần nhất</option>
-            <option value="1">1 ngày gần nhất</option>
-          </select>
-        </label>
-        <label class="flex items-center space-x-1.5 font-medium">
-          <span>Ngưỡng ổn định:</span>
-          <select id="analysis-threshold" onchange="onAnalysisPeriodChange()" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-            <option value="5">±5%</option>
-            <option value="0">0%</option>
-            <option value="10">±10%</option>
-          </select>
-        </label>
-        <span class="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:inline">• Độc lập với bộ lọc biểu đồ</span>
-      </div>
-<!-- Trend Analysis Summary -->
-      <div class="mt-4 space-y-3">
-        <!-- Delta trend badges -->
-        <div id="ai-trend-badges" class="flex flex-wrap items-center gap-2">
-          <!-- Injected by JS -->
-        </div>
+      <!-- Data Table (8 Columns on Desktop, Stacked Card-Rows on < 640px) -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse responsive-table">
+          <thead>
+            <tr class="border-b border-border-strong bg-app text-xs font-semibold text-muted uppercase tracking-wider">
+              <th class="py-3 px-3 sm:px-4 whitespace-nowrap">Ngày</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap hidden md:table-cell" title="Số người nhìn thấy quảng cáo">Reach</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap" title="Số lượt nhấp chuột">Clicks</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap" title="Tổng số tiền đã chi tiêu">Chi phí</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap" title="Số đơn hàng thành công">Đơn hàng</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap" title="Click/reach = Clicks / Reach">Click/reach</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap hidden lg:table-cell" title="CPC = Chi phí / Clicks">CPC</th>
+              <th class="py-3 px-2.5 text-right whitespace-nowrap text-primary-token" title="CPA = Chi phí / Đơn hàng">Chi phí/đơn (CPA)</th>
+              <th class="py-3 px-3 text-center whitespace-nowrap">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="data-table-body" class="divide-y divide-border text-xs sm:text-sm font-mono tabular-nums">
+            <!-- Populated by app.js -->
+          </tbody>
+          <tfoot id="data-table-foot" class="border-t-2 border-border-strong bg-app text-xs font-mono font-semibold tabular-nums hidden">
+            <!-- Populated by app.js with Totals / Averages -->
+          </tfoot>
+        </table>
 
-        <!-- AI Narrative & Structured Trend Blocks -->
-        <div id="ai-trend-summary" class="w-full space-y-3">
-          <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed flex items-start space-x-3">
-            <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-            <p class="flex-1 font-medium">Đang tính toán xu hướng biến động dữ liệu chiến dịch...</p>
+        <!-- Empty Table State -->
+        <div id="table-empty-state" class="p-8 sm:p-10 text-center flex flex-col items-center justify-center">
+          <div class="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-muted mb-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-foreground">Bảng dữ liệu đang&nbsp;trống</p>
+          <p class="text-xs text-muted mt-1 max-w-md">
+            Điền số liệu vào thanh nhập nhanh phía trên, tải tệp báo cáo lên hoặc nạp dữ liệu mẫu 14 ngày để trải nghiệm đầy đủ tính&nbsp;năng.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onclick="loadSampleDataAction()"
+              class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-semibold inline-flex items-center gap-1.5"
+            >
+              <span>Nạp dữ liệu mẫu 14 ngày</span>
+            </button>
+            <button
+              type="button"
+              onclick="openBulkModal()"
+              class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
+            >
+              <span>Nhập nhiều dòng cùng lúc</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Exactly 03 Actionable Recommendations -->
-      <div class="mt-5">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center">
-          <svg class="w-4 h-4 mr-1.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-          03 Gợi Ý Cải Thiện Chiến Dịch Hành Động (Actionable Recommendations)
-        </h4>
-        <div id="ai-recommendations-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <!-- Interactive AI Q&A Assistant with Context Caching -->
-      <div class="mt-6 pt-5 border-t border-slate-200/80 dark:border-slate-800">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
-            <span class="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-            </span>
-            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">
-              Hỏi Đáp Ngữ Cảnh Chiến Dịch (AI Q&A Assistant)
-            </h4>
-            <span id="ai-cache-indicator" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-              Context Caching Active
-            </span>
-          </div>
-          <span class="text-[11px] text-slate-400 hidden sm:inline">Đối chiếu 100% số liệu thực tế • 6 lớp kiểm soát</span>
-        </div>
-
-        <!-- Quick Question Prompts -->
-        <div class="flex flex-wrap gap-2 mb-3">
-          <button type="button" onclick="askAiQuestion('Vì sao CPA lại biến động trong kỳ này?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
-            💬 Vì sao CPA biến động?
-          </button>
-          <button type="button" onclick="askAiQuestion('Ngày nào trong dữ liệu mang lại hiệu quả tốt nhất?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
-            📅 Ngày nào hiệu quả nhất?
-          </button>
-          <button type="button" onclick="askAiQuestion('Nên ưu tiên hành động nào trước để hạ CPA mà không mất đơn?')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700">
-            🎯 Ưu tiên hành động nào trước?
-          </button>
-        </div>
-
-        <!-- Chat messages container -->
-        <div id="ai-chat-thread" class="space-y-3 max-h-72 overflow-y-auto pr-1 mb-3 hidden">
-          <!-- Injected by JS -->
-        </div>
-
-        <!-- Input box -->
-        <div class="flex items-center space-x-2">
-          <input type="text" id="ai-chat-input" placeholder="Hỏi AI bất kỳ điều gì về số liệu chiến dịch này..." class="flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400" onkeydown="if(event.key==='Enter') submitAiQuestion()" />
-          <button type="button" id="btn-submit-ai-chat" onclick="submitAiQuestion()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition-colors flex items-center space-x-1.5 shrink-0">
-            <span id="ai-chat-btn-text">Gửi câu hỏi</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-          </button>
-        </div>
-      </div>
     </section>
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-8">
-    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
-      Tactic AdPulse - Dashboard KPI Chiến Dịch Mini • Dành riêng cho Performance Marketers • Tự động tính Click/reach, CPC, CPA & AI phân tích xu hướng
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer class="bg-surface border-t border-border py-3.5 px-4 sm:px-6 lg:px-8 mt-auto">
+    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-foreground">Tactic AdPulse</span>
+        <span>•</span>
+        <span>Bảng điều khiển KPI Chiến dịch cho Performance&nbsp;Marketer</span>
+      </div>
+      <div>
+        Lưu trữ cục bộ an toàn trên trình duyệt (LocalStorage) • Sẵn sàng hoạt động&nbsp;Offline
+      </div>
     </div>
   </footer>
 
-  <!-- MODAL 1: NHẬP NHIỀU DÒNG (BULK DATA ENTRY) -->
-  <div id="bulk-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
+  <!-- ========================================================================
+       MODAL 1: BULK ENTRY MODAL (#bulk-modal)
+       ======================================================================== -->
+  <div id="bulk-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+    <div class="bg-surface rounded-xl border border-border shadow-modal w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+      <div class="p-4 sm:px-6 border-b border-border flex items-center justify-between">
         <div>
-          <h3 class="font-extrabold text-base text-slate-900 dark:text-white flex items-center">
-            <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Nhập Nhanh Nhiều Dòng (Bulk Entry Spreadsheet)
-          </h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Nhập trực tiếp nhiều ngày cùng lúc hoặc copy các cột từ Excel / Google Sheets rồi dán vào đây (Ctrl+V).</p>
+          <h3 class="text-base font-bold text-foreground">Nhập dữ liệu hàng loạt nhiều&nbsp;ngày</h3>
+          <p class="text-xs text-muted mt-0.5">
+            Điền nhanh số liệu cho nhiều ngày liên tiếp hoặc dán trực tiếp từ Excel (Ctrl+V). Các dòng âm sẽ tự động bị bỏ&nbsp;qua.
+          </p>
         </div>
-        <button onclick="closeBulkModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button type="button" onclick="closeBulkModal()" aria-label="Đóng" class="w-8 h-8 rounded-lg btn-secondary inline-flex items-center justify-center text-muted hover:text-foreground">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
-      <!-- Modal Body (Table of inputs) -->
-      <div class="p-5 overflow-y-auto flex-1" onpaste="handlePasteFromExcel(event)">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left">
+      <!-- Modal Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4" onpaste="handlePasteFromExcel(event)">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="text-xs text-muted">
+            Mẹo: Nhấn phím <kbd class="px-1.5 py-0.5 rounded bg-secondary text-foreground font-mono text-xs">Tab</kbd> để di chuyển nhanh giữa các&nbsp;ô.
+          </div>
+          <button
+            type="button"
+            onclick="addBulkRow()"
+            class="h-8 px-3 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Thêm dòng mới</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-border rounded-xl">
+          <table class="w-full text-left border-collapse bulk-table">
             <thead>
-              <tr class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-                <th class="p-2 w-36">Ngày</th>
-                <th class="p-2">Tiếp cận (Reach)</th>
-                <th class="p-2">Nhấp chuột (Clicks)</th>
-                <th class="p-2">Chi phí (VNĐ)</th>
-                <th class="p-2">Đơn hàng</th>
-                <th class="p-2 w-10 text-center">Xóa</th>
+              <tr class="bg-app border-b border-border-strong text-xs font-semibold text-muted uppercase">
+                <th class="py-2.5 px-3 w-40">Ngày (YYYY-MM-DD)</th>
+                <th class="py-2.5 px-3">Reach (Tiếp cận)</th>
+                <th class="py-2.5 px-3">Clicks (Lượt nhấp)</th>
+                <th class="py-2.5 px-3">Chi phí (₫)</th>
+                <th class="py-2.5 px-3">Đơn hàng</th>
+                <th class="py-2.5 px-3 w-12 text-center">Xóa</th>
               </tr>
             </thead>
-            <tbody id="bulk-table-body">
-              <!-- Dynamically generated rows -->
+            <tbody id="bulk-table-body" class="divide-y divide-border text-xs font-mono">
+              <!-- Populated by app.js -->
             </tbody>
           </table>
         </div>
-
-        <div class="mt-4 flex items-center justify-between">
-          <button type="button" onclick="addBulkRow()" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 rounded-lg transition">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            + Thêm dòng mới
-          </button>
-          <span class="text-xs text-slate-400 italic">Mẹo: Bạn có thể chọn và sao chép bảng 5 cột từ Excel rồi nhấn Ctrl+V bất cứ đâu trong bảng này!</span>
-        </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="flex items-center justify-end space-x-3 p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <button type="button" onclick="closeBulkModal()" class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+      <div class="p-4 sm:px-6 border-t border-border-strong bg-app flex items-center justify-end gap-2.5">
+        <button
+          type="button"
+          onclick="closeBulkModal()"
+          class="h-9 px-4 rounded-lg btn-secondary text-xs font-medium"
+        >
           Hủy bỏ
         </button>
-        <button type="button" onclick="saveBulkRows()" class="px-5 py-2 text-xs font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition flex items-center">
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          Lưu tất cả vào Dashboard
+        <button
+          type="button"
+          onclick="saveBulkRows()"
+          class="h-9 px-4 rounded-lg btn-primary text-xs font-semibold inline-flex items-center gap-1.5"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Lưu tất cả vào Dashboard</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: XUẤT BÁO CÁO TÓM TẮT DẠNG TEXT (COPY GỬI SẾP / KHÁCH HÀNG) -->
-  <div id="export-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
-      <!-- Header -->
-      <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
-          <div>
-            <h3 class="font-extrabold text-base text-slate-900 dark:text-white">Xuất Báo Cáo Tóm Tắt Dạng Text</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Định dạng chuẩn đẹp, sẵn sàng copy để gửi sếp hoặc khách hàng qua Zalo / Slack / Telegram.</p>
+  <!-- ========================================================================
+       MODAL 2: EXPORT REPORT MODAL (#export-modal)
+       ======================================================================== -->
+  <div id="export-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+    <div class="bg-surface rounded-xl border border-border shadow-modal w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:px-6 border-b border-border flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-foreground">Xuất báo cáo hiệu suất chiến&nbsp;dịch</h3>
+          <p class="text-xs text-muted mt-0.5">
+            Sao chép bản tóm tắt gửi nhanh qua Slack/Zalo/Email hoặc tải xuống tệp CSV đầy&nbsp;đủ.
+          </p>
+        </div>
+        <button type="button" onclick="closeExportModal()" aria-label="Đóng" class="w-8 h-8 rounded-lg btn-secondary inline-flex items-center justify-center text-muted hover:text-foreground">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
+        <div id="export-report-summary" class="p-4 rounded-xl bg-app border border-border-strong"></div>
+
+        <div class="flex items-center justify-between gap-2">
+          <label for="export-report-text" class="text-xs font-semibold text-muted uppercase tracking-wider">
+            Bản tóm tắt báo cáo (Văn&nbsp;bản)
+          </label>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="tab-tpl-boss" onclick="switchReportTemplate('boss')" class="h-8 px-3 text-xs font-semibold rounded-lg btn-primary">
+              Báo cáo đầy đủ
+            </button>
+            <button type="button" id="tab-tpl-compact" onclick="switchReportTemplate('compact')" class="h-8 px-3 text-xs font-medium rounded-lg btn-secondary">
+              Tóm tắt 4 dòng
+            </button>
           </div>
         </div>
-        <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <!-- Executive summary (paper style) -->
-      <div class="px-5 pt-4">
-        <div id="export-report-summary" class="rounded-xl bg-white text-slate-900 border border-slate-200 px-5 py-4"></div>
-      </div>
-
-      <!-- Format selector tabs -->
-      <div class="px-5 pt-4 flex items-center space-x-2">
-        <button id="tab-tpl-boss" type="button" onclick="switchReportTemplate('boss')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition">
-          Mẫu Báo Cáo Chuẩn (Chi Tiết & 3 Đề Xuất)
-        </button>
-        <button id="tab-tpl-compact" type="button" onclick="switchReportTemplate('compact')" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 transition">
-          Mẫu Tóm Tắt Nhanh (4 dòng)
-        </button>
-      </div>
-
-      <!-- Textarea preview -->
-      <div class="p-5 flex-1 flex flex-col overflow-y-auto">
-        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Nội dung báo cáo (bạn có thể tự do gõ sửa thêm ghi chú trước khi copy):</label>
-        <textarea id="export-report-text" rows="12" class="w-full flex-1 p-3.5 text-xs sm:text-sm font-mono rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition leading-relaxed"></textarea>
+        <textarea
+          id="export-report-text"
+          rows="10"
+          readonly
+          class="w-full p-3.5 text-xs font-mono leading-relaxed rounded-xl border border-border-strong bg-app text-foreground resize-none"
+        ></textarea>
       </div>
 
       <!-- Modal Footer -->
-      <div class="flex items-center justify-between p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <span class="text-xs text-slate-400 flex items-center">
-          <svg class="w-4 h-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          1-Click Copy vào Clipboard
-        </span>
-        <div class="flex items-center space-x-3">
-          <button type="button" onclick="closeExportModal()" class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+      <div class="p-4 sm:px-6 border-t border-border-strong bg-app flex flex-wrap items-center justify-between gap-2.5">
+        <button
+          type="button"
+          onclick="exportToCsv()"
+          class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
+        >
+          <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Tải tệp CSV (.csv)</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="closeExportModal()"
+            class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium"
+          >
             Đóng
           </button>
-          <button id="btn-do-copy" type="button" onclick="copyReportToClipboard()" class="px-5 py-2 text-xs font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/25 transition flex items-center">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-            Sao Chép Báo Cáo
+          <button
+            type="button"
+            id="btn-do-copy"
+            onclick="copyReportToClipboard()"
+            class="h-9 px-4 rounded-lg btn-primary text-xs font-semibold inline-flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <span>Sao chép báo cáo</span>
           </button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <!-- BACK TO TOP -->
-  <button id="btn-back-to-top" type="button" aria-label="Lên đầu trang" title="Lên đầu trang"
-    class="fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center transition-all duration-200 opacity-0 translate-y-3 pointer-events-none">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
+  <!-- ========================================================================
+       BACK TO TOP & TOAST NOTIFICATION CONTAINER
+       ======================================================================== -->
+  <button
+    id="btn-back-to-top"
+    type="button"
+    aria-label="Lên đầu trang"
+    title="Lên đầu trang"
+    class="fixed bottom-5 right-5 z-40 w-10 h-10 rounded-full btn-secondary shadow-popover flex items-center justify-center transition-all duration-200 opacity-0 translate-y-3 pointer-events-none"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
   </button>
 
-  <div id="toast-container" class="fixed bottom-20 right-5 z-50 space-y-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col gap-2 sm:w-80 pointer-events-none"></div>
 
-  <!-- SCRIPTS (Cache-Busted v2.4) -->
-  <script src="sample-data.js?v=2.8"></script>
-  <script src="analysis.js?v=2.8"></script>
-  <script src="app.js?v=2.8"></script>
+  <!-- Core Analytics & Application Logic -->
+  <script src="sample-data.js"></script>
+  <script src="analysis.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

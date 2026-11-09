@@ -113,8 +113,8 @@ function updateThemeIcon() {
   const btn = document.getElementById("btn-toggle-theme");
   if (!btn) return;
   btn.innerHTML = state.darkMode
-    ? `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`
-    : `<svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
+    ? `<svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`
+    : `<svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
 }
 
 // Data Management
@@ -182,10 +182,10 @@ function clearAllData(e) {
     clearTimeout(clearPendingTimer);
     btn.dataset.pendingConfirm = "false";
     btn.innerHTML = `
-      <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-      Xóa hết
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+      <span>Xóa hết</span>
     `;
-    btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition";
+    btn.className = "h-8 px-2.5 text-xs font-medium rounded-lg btn-secondary text-rose-600 dark:text-rose-400 inline-flex items-center gap-1 whitespace-nowrap";
     doClear();
     return;
   }
@@ -206,20 +206,20 @@ function clearAllData(e) {
     if (btn) {
       btn.dataset.pendingConfirm = "true";
       btn.innerHTML = `
-        <svg class="w-3.5 h-3.5 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        Bấm lại để xác nhận xóa hết!
+        <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <span>Bấm lại để xác nhận xóa hết!</span>
       `;
-      btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition animate-pulse";
+      btn.className = "h-8 px-2.5 text-xs font-semibold rounded-lg text-white bg-rose-600 hover:bg-rose-700 inline-flex items-center gap-1 whitespace-nowrap";
       showToast("Nhấp lại nút 'Xác nhận xóa hết' để đưa Dashboard về trạng thái trống!", "info");
 
       clearPendingTimer = setTimeout(() => {
         if (btn) {
           btn.dataset.pendingConfirm = "false";
           btn.innerHTML = `
-            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            Xóa hết
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <span>Xóa hết</span>
           `;
-          btn.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition";
+          btn.className = "h-8 px-2.5 text-xs font-medium rounded-lg btn-secondary text-rose-600 dark:text-rose-400 inline-flex items-center gap-1 whitespace-nowrap";
         }
       }, 4000);
     }
@@ -443,11 +443,9 @@ function startEditRecord(id) {
   const btnSubmit = document.getElementById("btn-submit-single");
   if (btnSubmit) {
     btnSubmit.innerHTML = `
-      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-      Cập nhật ngày
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <span>Cập nhật ngày</span>
     `;
-    btnSubmit.classList.remove("from-indigo-600", "to-violet-600");
-    btnSubmit.classList.add("from-emerald-600", "to-teal-600");
   }
 
   const btnCancel = document.getElementById("btn-cancel-edit");
@@ -464,11 +462,9 @@ function cancelEdit() {
   const btnSubmit = document.getElementById("btn-submit-single");
   if (btnSubmit) {
     btnSubmit.innerHTML = `
-      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-      Lưu số liệu ngày
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Lưu số liệu ngày</span>
     `;
-    btnSubmit.classList.add("from-indigo-600", "to-violet-600");
-    btnSubmit.classList.remove("from-emerald-600", "to-teal-600");
   }
 
   const btnCancel = document.getElementById("btn-cancel-edit");
@@ -532,8 +528,8 @@ function updateDateRangeBadge() {
   const startDate = formatDateVN(filtered[0].date);
   const endDate = formatDateVN(filtered[filtered.length - 1].date);
   badge.innerHTML = `
-    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-    ${startDate} - ${endDate} (${filtered.length} ngày)
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>
+    ${startDate} – ${endDate} (${filtered.length} ngày)
     ${simulatedTag()}
   `;
 }
@@ -598,6 +594,7 @@ function renderKpiCards() {
 // Render Table
 function renderTable() {
   const tableBody = document.getElementById("data-table-body");
+  const tableFoot = document.getElementById("data-table-foot");
   const emptyState = document.getElementById("table-empty-state");
   if (!tableBody) return;
 
@@ -605,6 +602,10 @@ function renderTable() {
 
   if (filtered.length === 0) {
     tableBody.innerHTML = "";
+    if (tableFoot) {
+      tableFoot.innerHTML = "";
+      tableFoot.classList.add("hidden");
+    }
     if (emptyState) emptyState.classList.remove("hidden");
     return;
   }
@@ -615,8 +616,12 @@ function renderTable() {
   const minCpa = validCpaItems.length > 0 ? Math.min(...validCpaItems.map((d) => d.cost / d.orders)) : null;
   const maxCpa = validCpaItems.length > 1 ? Math.max(...validCpaItems.map((d) => d.cost / d.orders)) : null;
 
+  const sumReach = filtered.reduce((a, d) => a + (d.reach || 0), 0);
+  const sumClicks = filtered.reduce((a, d) => a + (d.clicks || 0), 0);
   const sumCost = filtered.reduce((a, d) => a + (d.cost || 0), 0);
   const sumOrders = filtered.reduce((a, d) => a + (d.orders || 0), 0);
+  const avgCtr = sumReach > 0 ? (sumClicks / sumReach) * 100 : null;
+  const avgCpc = sumClicks > 0 ? Math.round(sumCost / sumClicks) : null;
   const avgCpa = sumOrders > 0 ? sumCost / sumOrders : null;
   const topCpa = validCpaItems.length ? Math.max(...validCpaItems.map((d) => d.cost / d.orders)) : 0;
 
@@ -626,46 +631,43 @@ function renderTable() {
       const cpc = item.clicks > 0 ? Math.round(item.cost / item.clicks) : 0;
       const cpa = item.orders > 0 ? Math.round(item.cost / item.orders) : 0;
 
-      let cpaHighlightClass = "text-slate-700 dark:text-slate-200";
+      let cpaHighlightClass = "text-foreground font-medium";
       let cpaBadge = "";
       if (item.orders > 0) {
         if (minCpa && cpa === Math.round(minCpa) && validCpaItems.length > 2) {
-          cpaHighlightClass = "text-emerald-600 dark:text-emerald-400 font-bold";
-          cpaBadge = `<span class="ml-1 text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-1.5 py-0.5 rounded">Tốt nhất</span>`;
+          cpaHighlightClass = "text-emerald-700 dark:text-emerald-400 font-bold";
+          cpaBadge = `<span class="ml-1.5 text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-1.5 py-0.5 rounded">Tốt nhất</span>`;
         } else if (maxCpa && cpa === Math.round(maxCpa) && validCpaItems.length > 2) {
-          cpaHighlightClass = "text-rose-600 dark:text-rose-400 font-bold";
-          cpaBadge = `<span class="ml-1 text-[10px] bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 px-1.5 py-0.5 rounded">Cao nhất</span>`;
+          cpaHighlightClass = "text-rose-700 dark:text-rose-400 font-bold";
+          cpaBadge = `<span class="ml-1.5 text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 px-1.5 py-0.5 rounded">Cao nhất</span>`;
         }
       }
 
       return `
-      <tr class="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-        <td data-label="Ngày" class="py-3 px-2.5 font-semibold text-slate-800 dark:text-slate-100">
-          <div class="flex items-center space-x-1.5">
-            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-            <span>${formatDateVN(item.date)}</span>
-          </div>
+      <tr class="data-row hover:bg-surface-subtle transition-colors">
+        <td data-label="Ngày" class="cell-date py-2.5 px-3 sm:px-4 font-semibold text-foreground whitespace-nowrap tabular-nums sticky left-0 bg-surface">
+          ${formatDateVN(item.date)}
         </td>
-        <td data-label="Reach" class="py-3 px-2.5 text-right font-medium text-slate-600 dark:text-slate-300">${formatNumber(item.reach)}</td>
-        <td data-label="Clicks" class="py-3 px-2.5 text-right font-medium text-slate-600 dark:text-slate-300">${formatNumber(item.clicks)}</td>
-        <td data-label="Chi phí" class="py-3 px-2.5 text-right font-semibold text-indigo-600 dark:text-indigo-400">${formatCurrency(item.cost)}</td>
-        <td data-label="Đơn" class="py-3 px-2.5 text-right font-semibold text-amber-600 dark:text-amber-400">
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40">
+        <td data-label="Reach" class="py-2.5 px-2.5 text-right font-medium text-muted whitespace-nowrap tabular-nums hidden md:table-cell">${formatNumber(item.reach)}</td>
+        <td data-label="Clicks" class="py-2.5 px-2.5 text-right font-medium text-foreground whitespace-nowrap tabular-nums">${formatNumber(item.clicks)}</td>
+        <td data-label="Chi phí" class="py-2.5 px-2.5 text-right font-semibold text-foreground whitespace-nowrap tabular-nums">${formatCurrency(item.cost)}</td>
+        <td data-label="Đơn hàng" class="py-2.5 px-2.5 text-right font-semibold text-foreground whitespace-nowrap tabular-nums">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-secondary text-foreground">
             ${formatNumber(item.orders)} đơn
           </span>
         </td>
-        <td data-label="Click/reach" class="py-3 px-2.5 text-right font-medium text-blue-600 dark:text-blue-400">${item.reach > 0 ? formatPercent(ctr) : "Chưa xác định"}</td>
-        <td data-label="CPC" class="py-3 px-2.5 text-right font-medium text-slate-600 dark:text-slate-300">${item.clicks > 0 ? formatCurrency(cpc) : "Chưa xác định"}</td>
-        <td data-label="Chi phí/đơn (CPA)" class="py-3 px-2.5 text-right ${cpaHighlightClass}">
-          <div class="text-right">${item.orders > 0 ? formatCurrency(cpa) : '<span class="text-slate-400 italic">Chưa xác định</span>'}${cpaBadge}${cpaBar(item, avgCpa, topCpa)}</div>
+        <td data-label="Click/reach" class="py-2.5 px-2.5 text-right font-medium text-foreground whitespace-nowrap tabular-nums">${item.reach > 0 ? formatPercent(ctr) : "Chưa xác định"}</td>
+        <td data-label="CPC" class="py-2.5 px-2.5 text-right font-medium text-muted whitespace-nowrap tabular-nums hidden lg:table-cell">${item.clicks > 0 ? formatCurrency(cpc) : "Chưa xác định"}</td>
+        <td data-label="Chi phí/đơn (CPA)" class="py-2.5 px-2.5 text-right whitespace-nowrap tabular-nums ${cpaHighlightClass}">
+          <div class="sm:text-right">${item.orders > 0 ? formatCurrency(cpa) : '<span class="text-muted italic">Chưa xác định</span>'}${cpaBadge}${cpaBar(item, avgCpa, topCpa)}</div>
         </td>
-        <td data-label="Thao tác" class="py-3 px-2.5 text-center">
-          <div class="flex items-center justify-center space-x-2">
-            <button onclick="startEditRecord('${item.id}')" title="Chỉnh sửa" class="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        <td data-label="Thao tác" class="cell-actions py-2 px-3 text-center whitespace-nowrap">
+          <div class="flex items-center justify-end sm:justify-center gap-1.5">
+            <button type="button" onclick="startEditRecord('${item.id}')" title="Chỉnh sửa ngày ${formatDateVN(item.date)}" aria-label="Chỉnh sửa ngày ${formatDateVN(item.date)}" class="w-8 h-8 rounded-lg btn-subtle inline-flex items-center justify-center text-muted hover:text-foreground">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </button>
-            <button onclick="deleteRecord('${item.id}')" title="Xóa" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <button type="button" onclick="deleteRecord('${item.id}')" title="Xóa ngày ${formatDateVN(item.date)}" aria-label="Xóa ngày ${formatDateVN(item.date)}" class="w-8 h-8 rounded-lg btn-subtle inline-flex items-center justify-center text-muted hover:text-rose-600 dark:hover:text-rose-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
           </div>
         </td>
@@ -673,6 +675,23 @@ function renderTable() {
       `;
     })
     .join("");
+
+  if (tableFoot) {
+    tableFoot.classList.remove("hidden");
+    tableFoot.innerHTML = `
+      <tr>
+        <td data-label="Kỳ tổng hợp" class="py-3 px-3 sm:px-4 font-bold text-foreground whitespace-nowrap sticky left-0 bg-surface-subtle">Tổng / TB (${filtered.length} ngày)</td>
+        <td data-label="Tổng Reach" class="py-3 px-2.5 text-right font-semibold text-muted whitespace-nowrap tabular-nums hidden md:table-cell">${formatNumber(sumReach)}</td>
+        <td data-label="Tổng Clicks" class="py-3 px-2.5 text-right font-semibold text-foreground whitespace-nowrap tabular-nums">${formatNumber(sumClicks)}</td>
+        <td data-label="Tổng Chi phí" class="py-3 px-2.5 text-right font-bold text-foreground whitespace-nowrap tabular-nums">${formatCurrency(sumCost)}</td>
+        <td data-label="Tổng Đơn hàng" class="py-3 px-2.5 text-right font-bold text-foreground whitespace-nowrap tabular-nums">${formatNumber(sumOrders)} đơn</td>
+        <td data-label="TB Click/reach" class="py-3 px-2.5 text-right font-semibold text-foreground whitespace-nowrap tabular-nums">${avgCtr !== null ? formatPercent(avgCtr) : "Chưa xác định"}</td>
+        <td data-label="TB CPC" class="py-3 px-2.5 text-right font-semibold text-muted whitespace-nowrap tabular-nums hidden lg:table-cell">${avgCpc !== null ? formatCurrency(avgCpc) : "Chưa xác định"}</td>
+        <td data-label="TB CPA" class="py-3 px-2.5 text-right font-bold text-foreground whitespace-nowrap tabular-nums">${avgCpa !== null ? formatCurrency(Math.round(avgCpa)) : "Chưa xác định"}</td>
+        <td class="py-3 px-3 text-center text-muted hidden sm:table-cell">—</td>
+      </tr>
+    `;
+  }
 }
 
 // Render Chart with Multi-axis and View Modes
@@ -708,11 +727,16 @@ function renderChart() {
   const ordersData = filtered.map((d) => d.orders);
   const ctrData = filtered.map((d) => (d.reach > 0 ? +((d.clicks / d.reach) * 100).toFixed(2) : null));
   const cpaData = filtered.map((d) => (d.orders > 0 ? Math.round(d.cost / d.orders) : null));
-  const cpcData = filtered.map((d) => (d.clicks > 0 ? Math.round(d.cost / d.clicks) : null));
 
   const isDark = document.documentElement.classList.contains("dark");
-  const textColor = isDark ? "#94a3b8" : "#64748b";
-  const gridColor = isDark ? "rgba(148, 163, 184, 0.1)" : "rgba(226, 232, 240, 0.8)";
+  const textColor = isDark ? "#9ca3af" : "#5b606b";
+  const gridColor = isDark ? "rgba(156, 163, 175, 0.12)" : "rgba(222, 222, 227, 0.75)";
+  const fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+
+  const colCost = isDark ? "#818cf8" : "#4f46e5";
+  const colReach = isDark ? "#38bdf8" : "#0284c7";
+  const colCtr = isDark ? "#34d399" : "#059669";
+  const colOrders = isDark ? "#fbbf24" : "#d97706";
 
   let datasets = [];
   let scales = {};
@@ -720,17 +744,16 @@ function renderChart() {
   const type = state.chartType; // 'combo', 'line', 'bar'
 
   if (state.chartMetricView === "all") {
-    // Multi-Axis: Cost (Bar/Line on right axis), Reach (Line on left axis), Orders (Line/Bar on 3rd axis)
     datasets = [
       {
         label: "Chi phí (VNĐ)",
         type: type === "combo" ? "bar" : type,
         data: costData,
         yAxisID: "yCost",
-        backgroundColor: isDark ? "rgba(99, 102, 241, 0.35)" : "rgba(99, 102, 241, 0.25)",
-        borderColor: "#6366f1",
-        borderWidth: 2,
-        borderRadius: 6,
+        backgroundColor: isDark ? "rgba(129, 140, 248, 0.28)" : "rgba(79, 70, 229, 0.2)",
+        borderColor: colCost,
+        borderWidth: 1.5,
+        borderRadius: 4,
         order: 3,
       },
       {
@@ -738,12 +761,12 @@ function renderChart() {
         type: "line",
         data: reachData,
         yAxisID: "yCount",
-        borderColor: "#06b6d4",
-        backgroundColor: "rgba(6, 182, 212, 0.1)",
-        borderWidth: 2.5,
+        borderColor: colReach,
+        backgroundColor: "rgba(2, 132, 199, 0.08)",
+        borderWidth: 2,
         tension: 0.3,
-        pointRadius: 3.5,
-        pointHoverRadius: 6,
+        pointRadius: 3,
+        pointHoverRadius: 5,
         fill: false,
         order: 2,
       },
@@ -752,12 +775,12 @@ function renderChart() {
         type: "line",
         data: ordersData,
         yAxisID: "yOrders",
-        borderColor: "#f59e0b",
-        backgroundColor: "#f59e0b",
-        borderWidth: 3,
+        borderColor: colOrders,
+        backgroundColor: colOrders,
+        borderWidth: 2.5,
         tension: 0.3,
-        pointRadius: 4.5,
-        pointHoverRadius: 7,
+        pointRadius: 4,
+        pointHoverRadius: 6,
         order: 1,
       },
     ];
@@ -765,139 +788,136 @@ function renderChart() {
     scales = {
       x: {
         grid: { color: gridColor },
-        ticks: { color: textColor, font: { family: "'Plus Jakarta Sans', sans-serif" } },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 } },
       },
       yCount: {
         type: "linear",
         display: true,
         position: "left",
-        title: { display: true, text: "Lượt Tiếp cận", color: "#06b6d4", font: { weight: "600" } },
+        title: { display: true, text: "Tiếp cận", color: colReach, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { color: gridColor },
-        ticks: { color: textColor, callback: (v) => formatNumber(v) },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => formatNumber(v) },
       },
       yCost: {
         type: "linear",
         display: true,
         position: "right",
-        title: { display: true, text: "Chi phí (VNĐ)", color: "#6366f1", font: { weight: "600" } },
+        title: { display: true, text: "Chi phí", color: colCost, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { drawOnChartArea: false },
-        ticks: { color: textColor, callback: (v) => (v >= 1000000 ? v / 1000000 + " tr" : v / 1000 + " k") },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => (v >= 1000000 ? v / 1000000 + " tr" : v / 1000 + " k") },
       },
       yOrders: {
         type: "linear",
         display: true,
         position: "right",
-        title: { display: true, text: "Đơn hàng", color: "#f59e0b", font: { weight: "600" } },
+        title: { display: true, text: "Đơn", color: colOrders, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { drawOnChartArea: false },
-        ticks: { color: textColor, stepSize: 5 },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, stepSize: 5 },
       },
     };
   } else if (state.chartMetricView === "cost_orders") {
-    // Focus on Cost & Orders
     datasets = [
       {
         label: "Chi phí (VNĐ)",
         type: type === "combo" ? "bar" : type,
         data: costData,
         yAxisID: "yCost",
-        backgroundColor: "rgba(99, 102, 241, 0.4)",
-        borderColor: "#6366f1",
-        borderWidth: 2,
-        borderRadius: 6,
+        backgroundColor: isDark ? "rgba(129, 140, 248, 0.32)" : "rgba(79, 70, 229, 0.24)",
+        borderColor: colCost,
+        borderWidth: 1.5,
+        borderRadius: 4,
       },
       {
         label: "Số đơn hàng",
         type: "line",
         data: ordersData,
         yAxisID: "yOrders",
-        borderColor: "#f59e0b",
-        backgroundColor: "rgba(245, 158, 11, 0.2)",
-        borderWidth: 3,
+        borderColor: colOrders,
+        backgroundColor: "rgba(217, 119, 6, 0.14)",
+        borderWidth: 2.5,
         tension: 0.35,
         fill: true,
-        pointRadius: 5,
+        pointRadius: 4,
       },
     ];
 
     scales = {
       x: {
         grid: { color: gridColor },
-        ticks: { color: textColor },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 } },
       },
       yCost: {
         type: "linear",
         position: "left",
-        title: { display: true, text: "Chi phí (VNĐ)", color: "#6366f1", font: { weight: "600" } },
+        title: { display: true, text: "Chi phí (VNĐ)", color: colCost, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { color: gridColor },
-        ticks: { color: textColor, callback: (v) => formatCurrency(v) },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => formatCurrency(v) },
       },
       yOrders: {
         type: "linear",
         position: "right",
-        title: { display: true, text: "Số đơn hàng", color: "#f59e0b", font: { weight: "600" } },
+        title: { display: true, text: "Số đơn hàng", color: colOrders, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { drawOnChartArea: false },
-        ticks: { color: textColor },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 } },
       },
     };
   } else if (state.chartMetricView === "reach_clicks") {
-    // Traffic Funnel: Reach vs Clicks
     datasets = [
       {
         label: "Tiếp cận (Reach)",
         type: type === "combo" ? "bar" : type,
         data: reachData,
         yAxisID: "yReach",
-        backgroundColor: "rgba(6, 182, 212, 0.3)",
-        borderColor: "#06b6d4",
-        borderWidth: 2,
-        borderRadius: 6,
+        backgroundColor: isDark ? "rgba(56, 189, 248, 0.26)" : "rgba(2, 132, 199, 0.22)",
+        borderColor: colReach,
+        borderWidth: 1.5,
+        borderRadius: 4,
       },
       {
         label: "Lượt nhấp (Clicks)",
         type: "line",
         data: clicksData,
         yAxisID: "yClicks",
-        borderColor: "#3b82f6",
-        backgroundColor: "rgba(59, 130, 246, 0.2)",
-        borderWidth: 3,
+        borderColor: colCost,
+        backgroundColor: "rgba(79, 70, 229, 0.14)",
+        borderWidth: 2.5,
         tension: 0.3,
-        pointRadius: 4.5,
+        pointRadius: 4,
       },
     ];
 
     scales = {
       x: {
         grid: { color: gridColor },
-        ticks: { color: textColor },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 } },
       },
       yReach: {
         type: "linear",
         position: "left",
-        title: { display: true, text: "Tiếp cận (Reach)", color: "#06b6d4", font: { weight: "600" } },
+        title: { display: true, text: "Tiếp cận (Reach)", color: colReach, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { color: gridColor },
-        ticks: { color: textColor, callback: (v) => formatNumber(v) },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => formatNumber(v) },
       },
       yClicks: {
         type: "linear",
         position: "right",
-        title: { display: true, text: "Lượt nhấp (Clicks)", color: "#3b82f6", font: { weight: "600" } },
+        title: { display: true, text: "Lượt nhấp (Clicks)", color: colCost, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { drawOnChartArea: false },
-        ticks: { color: textColor, callback: (v) => formatNumber(v) },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => formatNumber(v) },
       },
     };
   } else if (state.chartMetricView === "efficiency") {
-    // Efficiency: Click/reach (%) & CPA (VND)
     datasets = [
       {
         label: "Click/reach (%)",
         type: "line",
         data: ctrData,
         yAxisID: "yCtr",
-        borderColor: "#10b981",
-        backgroundColor: "rgba(16, 185, 129, 0.15)",
+        borderColor: colCtr,
+        backgroundColor: "rgba(5, 150, 105, 0.12)",
         borderWidth: 2.5,
         tension: 0.35,
-        pointRadius: 4,
+        pointRadius: 3.5,
         fill: true,
       },
       {
@@ -905,33 +925,33 @@ function renderChart() {
         type: "line",
         data: cpaData,
         yAxisID: "yCpa",
-        borderColor: "#ec4899",
+        borderColor: colOrders,
         backgroundColor: "transparent",
         borderWidth: 2.5,
         borderDash: [5, 5],
         tension: 0.35,
-        pointRadius: 4,
+        pointRadius: 3.5,
       },
     ];
 
     scales = {
       x: {
         grid: { color: gridColor },
-        ticks: { color: textColor },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 } },
       },
       yCtr: {
         type: "linear",
         position: "left",
-        title: { display: true, text: "Click/reach (%)", color: "#10b981", font: { weight: "600" } },
+        title: { display: true, text: "Click/reach (%)", color: colCtr, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { color: gridColor },
-        ticks: { color: textColor, callback: (v) => v + "%" },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => v + "%" },
       },
       yCpa: {
         type: "linear",
         position: "right",
-        title: { display: true, text: "CPA (VNĐ)", color: "#ec4899", font: { weight: "600" } },
+        title: { display: true, text: "CPA (VNĐ)", color: colOrders, font: { family: fontFamily, weight: "600", size: 11 } },
         grid: { drawOnChartArea: false },
-        ticks: { color: textColor, callback: (v) => formatCurrency(v) },
+        ticks: { color: textColor, font: { family: fontFamily, size: 11 }, callback: (v) => formatCurrency(v) },
       },
     };
   }
@@ -958,21 +978,22 @@ function renderChart() {
           position: "top",
           labels: {
             color: textColor,
-            font: { family: "'Plus Jakarta Sans', sans-serif", weight: "500", size: 12 },
+            font: { family: fontFamily, weight: "500", size: 12 },
             usePointStyle: true,
             boxWidth: 8,
           },
         },
         tooltip: {
-          backgroundColor: isDark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)",
-          titleColor: isDark ? "#f8fafc" : "#0f172a",
-          bodyColor: isDark ? "#cbd5e1" : "#334155",
-          borderColor: isDark ? "#334155" : "#e2e8f0",
+          backgroundColor: isDark ? "rgba(19, 22, 27, 0.96)" : "rgba(255, 255, 255, 0.96)",
+          titleColor: isDark ? "#f3f4f6" : "#111318",
+          bodyColor: isDark ? "#d1d5db" : "#374151",
+          borderColor: isDark ? "#2a2f3a" : "#dedee3",
           borderWidth: 1,
           padding: 12,
           boxPadding: 6,
           usePointStyle: true,
-          titleFont: { weight: "bold", size: 13 },
+          titleFont: { family: fontFamily, weight: "600", size: 12 },
+          bodyFont: { family: fontFamily, size: 12 },
           callbacks: {
             label: function (context) {
               const label = context.dataset.label || "";
@@ -1036,178 +1057,97 @@ function analyzeCampaignIntelligenceOffline() { return analyzeCampaignIntelligen
 function renderTrendBlocks(analysis) {
   const res = analysis.rawResult;
   if (!res) {
-    return `<div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed"><p class="font-medium">${escapeHtml(analysis.trendSummary)}</p></div>`;
-  }
-
-  // 1. Determine Tone styling for the Conclusion Card
-  let toneBorder = "border-indigo-200/80 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200";
-  let toneBadge = "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300";
-  let toneIcon = `<svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-
-  if (res.complete && res.delta) {
-    const o = Math.abs(res.delta.orders || 0) <= (res.threshold || 5) ? 0 : Math.sign(res.delta.orders || 0);
-    const c = Math.abs(res.delta.cpa || 0) <= (res.threshold || 5) ? 0 : Math.sign(res.delta.cpa || 0);
-    if (o > 0 && c < 0) {
-      toneBorder = "border-emerald-300/80 dark:border-emerald-800/80 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200";
-      toneBadge = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300";
-      toneIcon = `<svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-    } else if (o < 0 && c > 0) {
-      toneBorder = "border-rose-300/80 dark:border-rose-800/80 bg-rose-50/80 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200";
-      toneBadge = "bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300";
-      toneIcon = `<svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
-    } else if ((o > 0 && c > 0) || (o < 0 && c < 0)) {
-      toneBorder = "border-amber-300/80 dark:border-amber-800/80 bg-amber-50/80 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200";
-      toneBadge = "bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300";
-      toneIcon = `<svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-    }
+    return `<div class="p-3.5 rounded-lg bg-surface-subtle border border-border text-xs text-foreground leading-relaxed"><p class="font-medium">${escapeHtml(analysis.trendSummary)}</p></div>`;
   }
 
   // Khối 1: Chu kỳ so sánh & Dữ liệu ghi nhận
   const blockHeader = `
-    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs">
-      <div class="flex items-center space-x-2.5 min-w-0">
-        <span class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 text-sm font-bold">📅</span>
-        <div class="min-w-0">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">Chu kỳ so sánh</span>
-          <span class="font-bold text-slate-800 dark:text-slate-100 truncate block text-xs sm:text-sm">${escapeHtml(analysis.rangeHeader)}</span>
-        </div>
+    <div class="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg bg-surface-subtle border border-border text-xs">
+      <div class="min-w-0">
+        <span class="font-semibold text-foreground block">${escapeHtml(analysis.rangeHeader)}</span>
       </div>
-      <div class="flex items-center space-x-1.5 shrink-0 flex-wrap">
-        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${res.complete ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'}">
-          Dữ liệu: ${res.coverage.current}/${res.days} ngày
+      <div class="flex items-center gap-1.5 shrink-0 flex-wrap">
+        <span class="px-2 py-0.5 rounded text-xs font-semibold ${res.complete ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'}">
+          Dữ liệu: ${res.coverage.current}/${res.days}&nbsp;ngày
         </span>
-        ${res.prevStart ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Ngưỡng ổn định: ±${res.threshold}% (quy ước)</span>` : `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Dữ liệu ban đầu (< 7 ngày)</span>`}
+        ${res.prevStart ? `<span class="px-2 py-0.5 rounded text-xs font-medium bg-secondary text-muted">Ngưỡng ổn định: ±${res.threshold}%</span>` : `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-secondary text-foreground">Dữ liệu ban đầu (&lt; 7&nbsp;ngày)</span>`}
       </div>
     </div>
   `;
 
-  // Khối 2: Đánh giá tổng quan (Tình hình chiến dịch)
-  const blockVerdict = `
-    <div class="p-4 rounded-xl border ${toneBorder} shadow-xs">
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider">
-          ${toneIcon}
-          <span>Đánh giá chung</span>
-        </div>
-        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${toneBadge}">Tình hình chiến dịch</span>
-      </div>
-      <div class="text-base sm:text-lg font-black tracking-tight leading-snug">
-        ${escapeHtml(res.conclusion)}
-      </div>
-    </div>
-  `;
-
-  // Khối 3: Vì sao chi phí mỗi đơn (CPA) thay đổi? (Root-Cause Driver)
+  // Khối 2: Vì sao chi phí mỗi đơn (CPA) thay đổi? (Root-Cause Driver)
   let blockDriver = '';
   if (res.complete && res.driver?.driverSummary) {
     blockDriver = `
-      <div class="p-3.5 rounded-xl bg-gradient-to-r from-indigo-50/80 via-white to-purple-50/60 dark:from-indigo-950/40 dark:via-slate-800/60 dark:to-purple-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-xs">
-        <div class="flex items-center justify-between mb-1.5">
-          <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
-            <span class="text-sm">🔬</span>
-            <span>Vì sao giá mỗi đơn (CPA) thay đổi?</span>
-          </div>
-          <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">CPA = Giá click ÷ Tỷ lệ chốt</span>
+      <div class="p-3.5 rounded-lg bg-surface-subtle border border-border">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-muted">Vì sao giá mỗi đơn (CPA) thay&nbsp;đổi?</span>
+          <span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground whitespace-nowrap">CPA = CPC ÷ CVR</span>
         </div>
-        <p class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
+        <p class="text-xs sm:text-sm font-semibold text-foreground leading-relaxed">
           ${escapeHtml(res.driver.driverSummary)}
         </p>
       </div>
     `;
   }
 
-  // Khối 4: Chi tiết các chỉ số thực tế (Evidence Grid Cards)
+  // Khối 3: Chi tiết các chỉ số thực tế giữa 2 kỳ
   let blockEvidence = '';
   if (res.complete && Array.isArray(res.evidence) && res.evidence.length > 0) {
-    const metricIcons = {
-      cost: '💰',
-      orders: '📦',
-      cpa: '🏷️',
-      cpc: '💵',
-      cvr: '🔄',
-      clickReach: '🎯'
-    };
-    const metricNames = {
-      cost: 'Chi phí/ngày',
-      orders: 'Số đơn/ngày',
-      cpa: 'Giá mỗi đơn (CPA)',
-      cpc: 'Giá mỗi click (CPC)',
-      cvr: 'Tỷ lệ ra đơn (CVR)',
-      clickReach: 'Tỷ lệ click/tiếp cận'
-    };
-
-    const cards = res.evidence.map((ev) => {
+    const rows = res.evidence.map((ev, idx) => {
       const deltaVal = res.delta?.[ev.id];
       let deltaBadge = '';
       if (deltaVal !== null && deltaVal !== undefined && isFinite(deltaVal)) {
         const isGood = ['orders', 'cvr', 'clickReach'].includes(ev.id) ? deltaVal > 0 : deltaVal < 0;
-        const color = Math.abs(deltaVal) <= res.threshold
-          ? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600'
+        const color = Math.abs(deltaVal) <= (res.threshold || 5)
+          ? 'bg-secondary text-muted'
           : isGood
-          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+          : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
         const sign = deltaVal > 0 ? '+' : '';
-        deltaBadge = `<span class="text-[11px] font-bold px-2 py-0.5 rounded border ${color}">${sign}${deltaVal.toLocaleString('vi-VN', {maximumFractionDigits: 2})}%</span>`;
+        deltaBadge = `<span class="text-xs font-semibold px-2 py-0.5 rounded shrink-0 tabular-nums ${color}">${sign}${deltaVal.toLocaleString('vi-VN', {maximumFractionDigits: 2})}%</span>`;
       }
 
       return `
-        <div class="p-3 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/70 shadow-xs flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center space-x-1.5">
-              <span>${metricIcons[ev.id] || '📌'}</span>
-              <span>${metricNames[ev.id] || ev.id}</span>
-            </span>
-            ${deltaBadge}
-          </div>
-          <div class="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            ${escapeHtml(ev.text)}
-          </div>
+        <div class="ev-row-${idx} flex items-center justify-between gap-2 py-2 px-3 text-xs">
+          <span class="text-foreground font-medium tabular-nums">${escapeHtml(ev.text)}</span>
+          ${deltaBadge}
         </div>
       `;
     }).join('');
 
     blockEvidence = `
-      <div class="space-y-2">
-        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          <span class="flex items-center space-x-1.5">
-            <span>📊</span>
-            <span>Chi tiết các chỉ số thực tế</span>
-          </span>
-          <span class="text-[10px] font-normal lowercase text-slate-400">so sánh giữa 2 chu kỳ</span>
+      <div class="rounded-lg border border-border bg-surface overflow-hidden">
+        <div class="px-3 py-2 bg-surface-subtle border-b border-border flex items-center justify-between text-xs font-semibold text-muted">
+          <span>Chi tiết các chỉ số thực tế (so sánh 2 chu&nbsp;kỳ)</span>
+          <span>% Thay&nbsp;đổi</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-          ${cards}
+        <div class="divide-y divide-border">
+          ${rows}
         </div>
       </div>
     `;
   } else if (!res.complete) {
     blockEvidence = `
-      <div class="p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/40 text-xs text-purple-900 dark:text-purple-200">
-        <div class="font-bold mb-1 flex items-center space-x-1.5">
-          <span>⏱️</span>
-          <span>Đang trong giai đoạn thu thập dữ liệu ban đầu (< 7 ngày)</span>
-        </div>
-        <p class="leading-relaxed text-purple-800/90 dark:text-purple-300">
-          Đang theo dõi số liệu thực tế từ ngày ${escapeHtml(res.start || '—')} đến ${escapeHtml(res.end || '—')} (${res.coverage.current} ngày). Hệ thống sẽ tự động đưa ra 03 gợi ý cải thiện chiến dịch khi tích lũy đủ 7 ngày.
+      <div class="p-3.5 rounded-lg bg-surface-subtle border border-border text-xs text-foreground">
+        <div class="font-bold mb-1">Đang thu thập dữ liệu ban đầu (&lt; 7&nbsp;ngày)</div>
+        <p class="leading-relaxed text-muted">
+          Đang theo dõi số liệu thực tế từ ngày ${escapeHtml(res.start || '—')} đến ${escapeHtml(res.end || '—')} (${res.coverage.current} ngày). Hệ thống sẽ tự động đưa ra 03 gợi ý cải thiện chiến dịch khi tích lũy đủ 7&nbsp;ngày.
         </p>
       </div>
     `;
   }
 
-  // Khối 5: Lưu ý khi đọc số liệu (Disclaimers Box)
+  // Khối 4: Lưu ý khi đọc số liệu
   const blockDisclaimer = `
-    <div class="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/40 text-[11px] text-slate-500 dark:text-slate-400 flex items-start space-x-2">
-      <span class="text-xs shrink-0 mt-0.5">💡</span>
-      <span class="leading-relaxed">
-        <strong class="font-semibold text-slate-600 dark:text-slate-300">Lưu ý khi đọc số liệu:</strong> Tỷ lệ click/reach không tương đương với CTR (vì tính trên số người tiếp cận, không phải tổng lượt hiển thị). Tổng lượt tiếp cận (reach) cộng dồn theo ngày có thể bị trùng lặp người xem giữa các ngày. Báo cáo phản ánh hiệu quả vận hành quảng cáo, chưa tính doanh thu hoặc lợi nhuận thực tế.
-      </span>
+    <div class="p-2.5 rounded-lg bg-surface-subtle border border-border text-xs text-muted leading-relaxed">
+      <strong class="font-semibold text-foreground">Lưu ý khi đọc số liệu:</strong> Tỷ lệ click/reach không tương đương với CTR (vì tính trên số người tiếp cận, không phải tổng lượt hiển thị). Tổng reach cộng dồn theo ngày có thể trùng lặp người xem giữa các&nbsp;ngày.
     </div>
   `;
 
   return `
-    <div class="space-y-3">
+    <div class="space-y-2.5">
       ${blockHeader}
-      ${blockVerdict}
       ${blockDriver}
       ${blockEvidence}
       ${blockDisclaimer}
@@ -1226,64 +1166,45 @@ function renderAiAnalysis() {
   if (filtered.length === 0) {
     if (elStatus) {
       elStatus.innerText = "Chờ dữ liệu chiến dịch";
-      elStatus.className = "text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
+      elStatus.className = "text-xs font-semibold px-2.5 py-1 rounded-md bg-secondary text-muted whitespace-nowrap shrink-0";
     }
     if (elTrendSummary) {
       elTrendSummary.innerHTML = `
-        <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed flex items-start space-x-3">
-          <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-          <p class="flex-1 font-medium">Chưa có dữ liệu chiến dịch. Hệ thống AI và bộ chẩn đoán phễu sẽ tự động kích hoạt ngay khi bạn nhập từ 2 ngày số liệu trở lên.</p>
+        <div class="p-3.5 rounded-lg bg-surface-subtle border border-border text-xs text-muted leading-relaxed">
+          Chưa có dữ liệu chiến dịch. Hệ thống chẩn đoán phễu <strong class="font-mono text-foreground whitespace-nowrap">CPA = CPC ÷ CVR</strong> sẽ tự động kích hoạt ngay khi bạn nhập số&nbsp;liệu.
         </div>
       `;
     }
     if (containerMetrics) {
-      containerMetrics.innerHTML = `<span class="text-xs text-slate-400 italic">Nhập số liệu để AI phân tích % biến động giữa các chu kỳ.</span>`;
+      containerMetrics.innerHTML = "";
     }
     if (containerRecs) {
       containerRecs.innerHTML = `
-        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-800/60 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">1. Khởi tạo dữ liệu</span>
-              <span class="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">#1</span>
-            </div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1.5">Nhập số liệu hoặc nạp mẫu</h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">Nhập các trường: Tiếp cận (Reach), Lượt nhấp (Clicks), Chi phí và Đơn hàng theo ngày ở form bên trái hoặc dán từ bảng tính Excel.</p>
+        <div class="rec-empty-1 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-primary">1. Khởi tạo dữ&nbsp;liệu</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#1</span>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Thao tác:</span>
-            <button type="button" onclick="loadSampleDataAction()" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 px-2 py-0.5 rounded transition">⚡ Nạp 14 ngày mẫu</button>
-          </div>
+          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Nhập số liệu hoặc nạp 14 ngày&nbsp;mẫu</h4>
+          <p class="text-xs text-muted leading-relaxed">Điền Tiếp cận, Lượt nhấp, Chi phí và Đơn hàng theo ngày ở thanh nhập nhanh bên dưới hoặc dán từ bảng tính&nbsp;Excel.</p>
         </div>
 
-        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-800/60 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">2. Tự động hóa KPI</span>
-              <span class="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">#2</span>
-            </div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1.5">Tự động tính CTR, CPC, CPA</h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">Không cần nhớ công thức Excel, hệ thống tức thời tính toán tỷ lệ chuyển đổi, chi phí trên mỗi đơn và cảnh báo các ngày có chi phí đắt đỏ.</p>
+        <div class="rec-empty-2 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-primary">2. Tự động hóa&nbsp;KPI</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#2</span>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Tự động:</span>
-            <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">Realtime</span>
-          </div>
+          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Tự động tính Click/reach, CPC,&nbsp;CPA</h4>
+          <p class="text-xs text-muted leading-relaxed">Hệ thống tức thời tính toán tỷ lệ chuyển đổi, chi phí trên mỗi đơn và đánh dấu ngày có CPA tốt nhất hoặc cao&nbsp;nhất.</p>
         </div>
 
-        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-800/60 shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">3. Trợ lý AI thực chiến</span>
-              <span class="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">#3</span>
-            </div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1.5">Chẩn đoán và gợi ý 3 trụ cột</h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">Tích hợp mô hình Gemini 3.8 Flash hỗ trợ 'bắt bệnh' quảng cáo, phát hiện Ad Fatigue, gợi ý kịch bản hook và tư vấn cách vít ngân sách an toàn.</p>
+        <div class="rec-empty-3 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-primary">3. Chẩn đoán nhân quả &amp;&nbsp;AI</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#3</span>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Công nghệ:</span>
-            <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded">Gemini 3.8 Flash</span>
-          </div>
+          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Phân rã phễu và đề xuất 3 hành&nbsp;động</h4>
+          <p class="text-xs text-muted leading-relaxed">Xác định chính xác CPA biến động do giá thầu (CPC) hay tỷ lệ chốt đơn (CVR), kết hợp Gemini AI gợi ý hành động thực&nbsp;chiến.</p>
         </div>
       `;
     }
@@ -1294,14 +1215,14 @@ function renderAiAnalysis() {
 
   if (elStatus) {
     elStatus.innerText = analysis.statusLabel;
-    elStatus.className = `text-sm font-semibold px-3 py-1 rounded-full ${
+    elStatus.className = `text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap shrink-0 ${
       analysis.statusColor === "emerald"
         ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
         : analysis.statusColor === "rose"
         ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
         : analysis.statusColor === "amber"
         ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-        : "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300"
+        : "bg-secondary text-foreground"
     }`;
   }
 
@@ -1309,27 +1230,8 @@ function renderAiAnalysis() {
     elTrendSummary.innerHTML = renderTrendBlocks(analysis);
   }
 
-  // Trend Metric Badges
   if (containerMetrics) {
-    if (analysis.trendMetrics.length === 0) {
-      containerMetrics.innerHTML = `<span class="text-xs text-slate-400 italic">So sánh hai kỳ liền nhau có cùng số ngày, kết thúc tại ngày dữ liệu mới nhất.</span>`;
-    } else {
-      containerMetrics.innerHTML = analysis.trendMetrics
-        .map((m) => {
-          const isGood = m.isPositiveGood ? m.change >= 0 : m.change <= 0;
-          const bg = isGood
-            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40"
-            : "bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border-rose-200 dark:border-rose-800/40";
-          const icon = m.change >= 0 ? "↑" : "↓";
-          return `
-          <div class="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${bg}">
-            <span>${m.name}:</span>
-            <span class="font-bold">${icon} ${m.text}</span>
-          </div>
-        `;
-        })
-        .join("");
-    }
+    containerMetrics.innerHTML = "";
   }
 
   // Render 03 Actionable Recommendations
@@ -1337,22 +1239,13 @@ function renderAiAnalysis() {
     containerRecs.innerHTML = analysis.recommendations
       .map((rec, idx) => {
         return `
-        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-800/60 shadow-sm hover:border-indigo-400 dark:hover:border-indigo-500 transition-all flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">${escapeHtml(rec.pillar)}</span>
-              <span class="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">#${idx + 1}</span>
-            </div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1.5">${escapeHtml(rec.title)}</h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">${escapeHtml(rec.desc)}</p>
+        <div class="rec-card-${idx + 1} p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-primary">${escapeHtml(rec.pillar)}</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">${escapeHtml(rec.action || "Thực hiện")} · #${idx + 1}</span>
           </div>
-          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center">
-              <svg class="w-3.5 h-3.5 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              Hành động gợi ý:
-            </span>
-            <span class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded">${rec.action || "Thực hiện ngay"}</span>
-          </div>
+          <h4 class="font-bold text-foreground text-xs sm:text-sm">${escapeHtml(rec.title)}</h4>
+          <p class="text-xs text-muted leading-relaxed">${escapeHtml(rec.desc)}</p>
         </div>
       `;
       })
@@ -1464,28 +1357,21 @@ async function copyReportToClipboard() {
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(textToCopy);
     } else {
-      // Fallback
       textarea.select();
       if (!document.execCommand("copy")) throw new Error("Copy failed");
     }
 
     showToast("Đã sao chép báo cáo vào bộ nhớ tạm! Bạn có thể dán vào Zalo/Slack ngay.", "success");
 
-    // Button feedback animation
     const btnCopy = document.getElementById("btn-do-copy");
     if (btnCopy) {
       const origText = btnCopy.innerHTML;
       btnCopy.innerHTML = `
-        <svg class="w-4 h-4 mr-1.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        Đã sao chép thành công!
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Đã sao chép thành công!</span>
       `;
-      btnCopy.classList.remove("bg-indigo-600", "hover:bg-indigo-700");
-      btnCopy.classList.add("bg-emerald-600");
-
       setTimeout(() => {
         btnCopy.innerHTML = origText;
-        btnCopy.classList.add("bg-indigo-600", "hover:bg-indigo-700");
-        btnCopy.classList.remove("bg-emerald-600");
       }, 2500);
     }
   } catch (err) {
@@ -1500,19 +1386,14 @@ function switchReportTemplate(tpl) {
   if (!textarea) return;
   textarea.value = generateReportText(tpl);
 
-  // Update tabs style
   const tabBoss = document.getElementById("tab-tpl-boss");
   const tabCompact = document.getElementById("tab-tpl-compact");
   if (tpl === "boss") {
-    tabBoss?.classList.add("bg-indigo-600", "text-white");
-    tabBoss?.classList.remove("bg-slate-100", "text-slate-700", "dark:bg-slate-800", "dark:text-slate-300");
-    tabCompact?.classList.remove("bg-indigo-600", "text-white");
-    tabCompact?.classList.add("bg-slate-100", "text-slate-700", "dark:bg-slate-800", "dark:text-slate-300");
+    if (tabBoss) tabBoss.className = "h-8 px-3 text-xs font-semibold rounded-lg btn-primary";
+    if (tabCompact) tabCompact.className = "h-8 px-3 text-xs font-medium rounded-lg btn-secondary";
   } else {
-    tabCompact?.classList.add("bg-indigo-600", "text-white");
-    tabCompact?.classList.remove("bg-slate-100", "text-slate-700", "dark:bg-slate-800", "dark:text-slate-300");
-    tabBoss?.classList.remove("bg-indigo-600", "text-white");
-    tabBoss?.classList.add("bg-slate-100", "text-slate-700", "dark:bg-slate-800", "dark:text-slate-300");
+    if (tabCompact) tabCompact.className = "h-8 px-3 text-xs font-semibold rounded-lg btn-primary";
+    if (tabBoss) tabBoss.className = "h-8 px-3 text-xs font-medium rounded-lg btn-secondary";
   }
 }
 
@@ -1523,7 +1404,6 @@ function openBulkModal() {
 
   const tbody = document.getElementById("bulk-table-body");
   if (tbody) {
-    // Generate 3 blank rows by default
     tbody.innerHTML = "";
     let baseDate = new Date();
     if (state.data.length > 0) {
@@ -1555,26 +1435,26 @@ function addBulkRow(date = "", reach = "", clicks = "", cost = "", orders = "") 
   if (!tbody) return;
 
   const tr = document.createElement("tr");
-  tr.className = "border-b border-slate-200 dark:border-slate-800";
+  tr.className = "bulk-row border-b border-border";
   tr.innerHTML = `
-    <td class="p-2">
-      <input type="date" value="${date}" class="bulk-date w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500" required />
+    <td data-label="Ngày (YYYY-MM-DD)" class="p-2 bulk-cell-date">
+      <input type="text" inputmode="numeric" value="${date}" placeholder="YYYY-MM-DD" class="bulk-date w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground tabular-nums" required />
     </td>
-    <td class="p-2">
-      <input type="number" value="${reach}" placeholder="Ví dụ: 15000" class="bulk-reach w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500" required />
+    <td data-label="Reach (Tiếp cận)" class="p-2">
+      <input type="number" value="${reach}" placeholder="VD: 15000" class="bulk-reach w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground tabular-nums" required />
     </td>
-    <td class="p-2">
-      <input type="number" value="${clicks}" placeholder="Ví dụ: 450" class="bulk-clicks w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500" required />
+    <td data-label="Clicks (Lượt nhấp)" class="p-2">
+      <input type="number" value="${clicks}" placeholder="VD: 450" class="bulk-clicks w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground tabular-nums" required />
     </td>
-    <td class="p-2">
-      <input type="number" value="${cost}" placeholder="Ví dụ: 1200000" class="bulk-cost w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500" required />
+    <td data-label="Chi phí (₫)" class="p-2">
+      <input type="number" value="${cost}" placeholder="VD: 1200000" class="bulk-cost w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground tabular-nums" required />
     </td>
-    <td class="p-2">
-      <input type="number" value="${orders}" placeholder="Ví dụ: 20" class="bulk-orders w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-1 focus:ring-indigo-500" required />
+    <td data-label="Đơn hàng" class="p-2">
+      <input type="number" value="${orders}" placeholder="VD: 20" class="bulk-orders w-full h-9 px-2.5 text-xs rounded-lg border border-border-strong bg-surface text-foreground tabular-nums" required />
     </td>
-    <td class="p-2 text-center">
-      <button type="button" onclick="this.closest('tr').remove()" class="p-1 text-slate-400 hover:text-rose-500 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+    <td class="p-2 text-center bulk-cell-del">
+      <button type="button" onclick="this.closest('tr').remove()" aria-label="Xóa dòng" class="w-8 h-8 rounded-lg btn-subtle inline-flex items-center justify-center text-muted hover:text-rose-600">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
       </button>
     </td>
   `;
@@ -1597,7 +1477,6 @@ function saveBulkRows() {
     const cost = parseFloat(row.querySelector(".bulk-cost")?.value);
     const orders = parseInt(row.querySelector(".bulk-orders")?.value, 10);
 
-    // Skip empty rows
     if (!date || isNaN(reach) || isNaN(clicks) || isNaN(cost) || isNaN(orders)) {
       continue;
     }
@@ -1645,7 +1524,7 @@ function handlePasteFromExcel(e) {
   if (!pasteData) return;
 
   const lines = pasteData.trim().split(/\r\n|\n|\r/);
-  if (lines.length <= 1 && !lines[0].includes("\t")) return; // Not tab-separated or multi-line
+  if (lines.length <= 1 && !lines[0].includes("\t")) return;
 
   e.preventDefault();
   const tbody = document.getElementById("bulk-table-body");
@@ -1680,26 +1559,26 @@ function showToast(message, type = "info") {
   if (!container) return;
 
   const toast = document.createElement("div");
-  toast.className = `toast-enter flex items-center p-3.5 rounded-xl shadow-lg border text-sm max-w-sm pointer-events-auto transition-all ${
+  toast.className = `toast-enter flex items-center p-3.5 rounded-xl shadow-popover border text-xs sm:text-sm w-full pointer-events-auto transition-all ${
     type === "success"
       ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200"
       : type === "error"
       ? "bg-rose-50 dark:bg-rose-950 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200"
-      : "bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200"
+      : "bg-surface border-border text-foreground"
   }`;
 
   const icon =
     type === "success"
-      ? `<svg class="w-5 h-5 mr-2.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+      ? `<svg class="w-5 h-5 mr-2.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
       : type === "error"
-      ? `<svg class="w-5 h-5 mr-2.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-      : `<svg class="w-5 h-5 mr-2.5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+      ? `<svg class="w-5 h-5 mr-2.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+      : `<svg class="w-5 h-5 mr-2.5 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
 
   toast.innerHTML = `
     ${icon}
-    <div class="flex-1 font-medium">${message}</div>
-    <button onclick="this.parentElement.remove()" class="ml-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div class="flex-1 font-medium min-w-0 break-words">${message}</div>
+    <button type="button" onclick="this.parentElement.remove()" aria-label="Đóng thông báo" class="ml-2 w-8 h-8 rounded-lg btn-subtle inline-flex items-center justify-center text-muted shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
   `;
 
@@ -1953,14 +1832,14 @@ async function submitAiQuestion() {
   const userMsgId = 'chat-msg-' + Date.now();
   if (thread) {
     thread.innerHTML += `
-      <div class="flex items-start space-x-2.5 justify-end">
-        <div class="p-3 rounded-2xl bg-indigo-600 text-white text-xs sm:text-sm max-w-[85%] shadow-sm">
+      <div class="flex items-start gap-2 justify-end">
+        <div class="p-3 rounded-xl bg-primary text-white text-xs sm:text-sm max-w-[85%]">
           <p class="font-medium">${escapeHtml(question)}</p>
         </div>
       </div>
-      <div id="${userMsgId}" class="flex items-start space-x-2.5">
-        <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center text-[10px] text-indigo-600 font-bold shrink-0">AI</div>
-        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs sm:text-sm max-w-[85%] border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+      <div id="${userMsgId}" class="flex items-start gap-2">
+        <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-xs text-primary font-bold shrink-0">AI</div>
+        <div class="p-3 rounded-xl bg-surface-subtle text-foreground text-xs sm:text-sm max-w-[85%] border border-border-strong">
           <p class="animate-pulse">Đang đối chiếu dữ liệu chiến dịch và phản hồi...</p>
         </div>
       </div>
@@ -1995,15 +1874,15 @@ async function submitAiQuestion() {
     const el = document.getElementById(userMsgId);
     if (el) {
       const cacheBadge = data.cached
-        ? `<span class="inline-flex items-center text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full mr-2">⚡ Hit RAM Cache (0 token)</span>`
-        : `<span class="inline-flex items-center text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full mr-2">🤖 Gemini 3.8 Flash</span>`;
+        ? `<span class="inline-flex items-center text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded mr-2">Hit RAM Cache (0 token)</span>`
+        : `<span class="inline-flex items-center text-xs font-semibold text-primary bg-secondary px-2 py-0.5 rounded mr-2">Gemini 3.8 Flash</span>`;
 
       el.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center text-[10px] text-indigo-600 font-bold shrink-0">AI</div>
-        <div class="p-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs sm:text-sm max-w-[85%] border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-xs text-primary font-bold shrink-0">AI</div>
+        <div class="p-3 rounded-xl bg-surface text-foreground text-xs sm:text-sm max-w-[85%] border border-border-strong">
           <div class="flex items-center mb-1.5 flex-wrap gap-1">
             ${cacheBadge}
-            <span class="text-[10px] text-slate-400">Đã qua 6 lớp kiểm soát số liệu</span>
+            <span class="text-xs text-muted">Đã qua 6 lớp kiểm soát số liệu</span>
           </div>
           <p class="leading-relaxed font-normal whitespace-pre-line">${escapeHtml(data.answer)}</p>
         </div>
@@ -2013,8 +1892,8 @@ async function submitAiQuestion() {
     const el = document.getElementById(userMsgId);
     if (el) {
       el.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center text-[10px] text-rose-600 font-bold shrink-0">!</div>
-        <div class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs sm:text-sm max-w-[85%] border border-rose-200 dark:border-rose-900/50 shadow-sm">
+        <div class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-950 flex items-center justify-center text-xs text-rose-700 dark:text-rose-300 font-bold shrink-0">!</div>
+        <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 text-xs sm:text-sm max-w-[85%] border border-rose-200 dark:border-rose-900">
           <p>Không thể kết nối tới AI hoặc câu trả lời không vượt qua kiểm soát số liệu. Vui lòng thử lại với câu hỏi cụ thể hơn.</p>
         </div>
       `;
@@ -2026,11 +1905,8 @@ async function submitAiQuestion() {
   }
 }
 
-
-
-
 // ============================================================
-// UI v2.6: delta vs previous period, sparklines, hero, CPA bar, report summary
+// UI v3.0: delta vs previous period, sparklines, hero, CPA bar, report summary
 // Quy ước: chỉ hiện % thay đổi khi CẢ HAI kỳ đủ ngày (CampaignAnalysis.complete)
 // ============================================================
 function onAnalysisPeriodChange() {
@@ -2052,12 +1928,12 @@ function periodTooltip(snap) {
 function setDeltaChip(id, snap, key, mode) {
   const el = document.getElementById(id);
   if (!el) return;
-  const base = "text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ";
+  const base = "text-xs font-semibold px-2 py-0.5 rounded whitespace-nowrap tabular-nums ";
   const tone = {
-    good: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-    bad: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
-    info: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
-    mute: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
+    good: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+    bad: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
+    info: "bg-secondary text-foreground",
+    mute: "bg-secondary text-muted",
   };
   if (!snap) { el.className = ""; el.textContent = ""; el.removeAttribute("title"); return; }
   const v = snap.complete ? snap.delta[key] : null;
@@ -2079,7 +1955,7 @@ function setDeltaChip(id, snap, key, mode) {
 
 function sparkSvg(values, color) {
   const pts = values.map((v, i) => ({ v, i })).filter((p) => p.v !== null && Number.isFinite(p.v));
-  if (pts.length < 2) return '<div class="h-full flex items-end"><div class="w-full border-t border-dashed border-slate-300 dark:border-slate-600"></div></div>';
+  if (pts.length < 2) return '<div class="h-full flex items-end"><div class="w-full border-t border-dashed border-border-strong"></div></div>';
   const W = 120, H = 32, pad = 3;
   const min = Math.min(...pts.map((p) => p.v)), max = Math.max(...pts.map((p) => p.v));
   const span = max - min || 1;
@@ -2099,7 +1975,7 @@ function renderKpiExtras(rows, snap) {
     ctr: rows.map((d) => (d.reach > 0 ? (d.clicks / d.reach) * 100 : null)),
     orders: rows.map((d) => d.orders),
   };
-  const colors = { cost: "#6366f1", reach: "#06b6d4", ctr: "#10b981", orders: "#f59e0b" };
+  const colors = { cost: "#4f46e5", reach: "#0284c7", ctr: "#059669", orders: "#d97706" };
   for (const k of Object.keys(series)) {
     const el = document.getElementById("spark-" + k);
     if (el) el.innerHTML = rows.length ? sparkSvg(series[k], colors[k]) : "";
@@ -2116,32 +1992,47 @@ function renderHero() {
   const h = document.getElementById("hero-headline");
   const s = document.getElementById("hero-sub");
   const p = document.getElementById("hero-period");
+  const pill = document.getElementById("hero-status-pill");
   if (!box || !h || !s || !p) return;
   if (!state.data.length) {
     document.getElementById("hero-cta")?.classList.add("hidden");
     box.dataset.tone = "neutral";
-    h.textContent = "Chưa có số liệu chiến dịch";
-    s.textContent = "Nhập số liệu ngày đầu tiên ở form bên dưới hoặc dán nhiều dòng từ Excel. KPI, biểu đồ và nhận xét sẽ tự cập nhật.";
+    if (pill) {
+      pill.textContent = "Tổng quan\u00A0kỳ";
+      pill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold status-pill-neutral";
+    }
+    h.textContent = "Chưa có số liệu chiến\u00A0dịch";
+    s.textContent = "Nhập số liệu ngày đầu tiên ở form bên dưới hoặc dán nhiều dòng từ Excel. KPI, biểu đồ và nhận xét sẽ tự cập\u00A0nhật.";
     p.textContent = "";
     return;
   }
   document.getElementById("hero-cta")?.classList.remove("hidden");
   const snap = analysisSnapshot();
-  h.textContent = snap.conclusion;
+  h.textContent = String(snap.conclusion || "").replace(/\s+(\S+)$/, "\u00A0$1");
   p.textContent = "· " + (snap.complete ? snap.days + " ngày gần nhất " : state.data.length + " ngày ") + fmtShortDate(snap.start) + "–" + fmtShortDate(snap.end);
   if (!snap.complete) {
     box.dataset.tone = "neutral";
+    if (pill) {
+      pill.textContent = "Đang tích lũy dữ\u00A0liệu";
+      pill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold status-pill-neutral";
+    }
     const totals = snap.current;
     const bestDay = snap.extrema?.bestCpaDay ? ` · Ngày tốt nhất: ${fmtShortDate(snap.extrema.bestCpaDay.date)} (CPA ${formatCurrency(snap.extrema.bestCpaDay.cpa)})` : '';
-    s.textContent = `Tổng chi phí: ${formatCurrency(totals.cost)} · ${totals.orders} đơn hàng · CPA tb ${totals.cpa ? formatCurrency(Math.round(totals.cpa)) : 'Chưa xác định'}${bestDay} · Đang theo dõi máy học (đủ 7 ngày sẽ kích hoạt 03 gợi ý tối ưu).`;
+    s.textContent = `Tổng chi phí: ${formatCurrency(totals.cost)} · ${totals.orders} đơn hàng · CPA tb ${totals.cpa ? formatCurrency(Math.round(totals.cpa)) : 'Chưa xác định'}${bestDay} · Đang theo dõi máy học (đủ 7 ngày sẽ kích hoạt 03 gợi ý tối\u00A0ưu).`;
     return;
   }
   const d = snap.delta, t = snap.threshold;
   const o = d.orders === null ? 0 : Math.abs(d.orders) <= t ? 0 : Math.sign(d.orders);
   const c = d.cpa === null ? 0 : Math.abs(d.cpa) <= t ? 0 : Math.sign(d.cpa);
-  box.dataset.tone = o > 0 && c < 0 ? "good" : o < 0 && c > 0 ? "bad" : "neutral";
+  const tone = o > 0 && c < 0 ? "good" : o < 0 && c > 0 ? "bad" : "neutral";
+  box.dataset.tone = tone;
+  if (pill) {
+    pill.textContent = tone === "good" ? "Hiệu suất tích\u00A0cực" : tone === "bad" ? "Cảnh báo suy\u00A0giảm" : "Kết luận điều\u00A0hành";
+    const pillCls = tone === "good" ? "status-pill-scale" : tone === "bad" ? "status-pill-cut" : "status-pill-neutral";
+    pill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold " + pillCls;
+  }
   const part = (label, v) => label + " " + (v === null ? "chưa xác định" : fmtDeltaPct(v).replace("▲ ", "+").replace("▼ ", "−"));
-  const comparedText = snap.prevStart ? `so với ${fmtShortDate(snap.prevStart)}–${fmtShortDate(snap.prevEnd)}.` : 'so với nửa đầu tuần.';
+  const comparedText = snap.prevStart ? `so với\u00A0${fmtShortDate(snap.prevStart)}–${fmtShortDate(snap.prevEnd)}.` : 'so với nửa đầu\u00A0tuần.';
   s.textContent = [part("Số đơn/ngày", d.orders), part("CPA", d.cpa), part("Chi phí/ngày", d.cost)].join(" · ") + " " + comparedText;
 }
 
@@ -2152,40 +2043,45 @@ function cpaBar(item, avgCpa, topCpa) {
   const color = rel <= -5 ? "bg-emerald-500" : rel >= 5 ? "bg-rose-500" : "bg-amber-400";
   const w = Math.max(6, Math.round((cpa / topCpa) * 100));
   const tip = (rel >= 0 ? "+" : "−") + Math.abs(rel).toFixed(0) + "% so với CPA trung bình của giai đoạn đang xem";
-  return '<div class="mt-1 ml-auto w-16 h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden" title="' + tip + '"><div class="h-full rounded-full ' + color + '" style="width:' + w + '%"></div></div>';
+  return '<div class="mt-1 ml-auto w-16 h-1 rounded-full bg-secondary overflow-hidden" title="' + tip + '"><div class="h-full rounded-full ' + color + '" style="width:' + w + '%"></div></div>';
 }
 
 function renderExportSummary() {
   const box = document.getElementById("export-report-summary");
   if (!box) return;
-  if (!state.data.length) { box.innerHTML = '<p class="text-xs text-slate-500">Chưa có số liệu để tóm tắt.</p>'; return; }
+  if (!state.data.length) { box.innerHTML = '<p class="text-xs text-muted">Chưa có số liệu để tóm\u00A0tắt.</p>'; return; }
   const snap = analysisSnapshot();
   const cur = snap.current, d = snap.delta;
   const dl = (v) => {
-    if (!snap.complete || v === null || v === undefined) return '<span class="text-slate-400">chưa so sánh</span>';
-    if (Math.abs(v) <= snap.threshold) return '<span class="text-slate-500">ổn định</span>';
-    return '<span class="text-slate-700">' + fmtDeltaPct(v) + "</span>";
+    if (!snap.complete || v === null || v === undefined) return '<span class="text-muted">chưa so\u00A0sánh</span>';
+    if (Math.abs(v) <= snap.threshold) return '<span class="text-muted">ổn\u00A0định</span>';
+    return '<span class="text-foreground font-semibold">' + fmtDeltaPct(v) + "</span>";
   };
   const cell = (label, val, delta) =>
-    '<div><div class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">' + label + '</div>' +
-    '<div class="mt-1 text-lg sm:text-xl font-light tracking-tight text-slate-900 whitespace-nowrap">' + val + '</div>' +
-    '<div class="mt-0.5 text-[11px]">' + delta + "</div></div>";
+    '<div><div class="text-xs font-semibold text-muted">' + label + '</div>' +
+    '<div class="mt-1 text-base sm:text-lg font-bold tracking-tight text-foreground whitespace-nowrap tabular-nums">' + val + '</div>' +
+    '<div class="mt-0.5 text-xs tabular-nums">' + delta + "</div></div>";
   box.innerHTML =
-    '<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-3 border-b border-slate-200">' +
-      '<div class="text-sm font-bold text-slate-900 truncate">' + escapeHtml(state.campaignName) + "</div>" +
-      '<div class="text-[11px] text-slate-500">' + snap.days + " ngày gần nhất · " + fmtShortDate(snap.start) + "–" + fmtShortDate(snap.end) + "</div></div>" +
+    '<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-3 border-b border-border">' +
+      '<div class="text-sm font-bold text-foreground truncate">' + escapeHtml(state.campaignName) + "</div>" +
+      '<div class="text-xs text-muted tabular-nums">' + snap.days + " ngày gần nhất · " + fmtShortDate(snap.start) + "–" + fmtShortDate(snap.end) + "</div></div>" +
     '<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-3">' +
       cell("Chi phí", formatCurrency(cur.cost), dl(d.cost)) +
       cell("Số đơn", formatNumber(cur.orders), dl(d.orders)) +
       cell("CPA", cur.cpa === null ? "—" : formatCurrency(Math.round(cur.cpa)), dl(d.cpa)) +
       cell("Click/reach", cur.clickReach === null ? "—" : formatPercent(cur.clickReach), dl(d.clickReach)) +
     "</div>" +
-    '<div class="pt-3 mt-3 border-t border-slate-200 text-[11px] text-slate-500">' + escapeHtml(snap.conclusion) + "</div>";
+    '<div class="pt-3 mt-3 border-t border-border text-xs text-muted">' + escapeHtml(snap.conclusion) + "</div>";
 }
 
-
-// Nút lên đầu trang: hiện khi cuộn xuống quá 400px
+// Nút lên đầu trang: hiện khi cuộn xuống quá 400px + đóng Modal bằng phím Escape / bấm nền ngoài
 document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (typeof closeBulkModal === "function") closeBulkModal();
+      if (typeof closeExportModal === "function") closeExportModal();
+    }
+  });
   const btn = document.getElementById("btn-back-to-top");
   if (!btn) return;
   const hiddenCls = ["opacity-0", "translate-y-3", "pointer-events-none"];
@@ -2201,14 +2097,13 @@ document.addEventListener("DOMContentLoaded", () => {
   update();
 });
 
-
 // Phân biệt dữ liệu mô phỏng (nạp mẫu) với số liệu người dùng tự nhập
 function simulatedTag() {
   const isSim = (r) => /^(smp|sample)-/.test(String(r.id));
   const n = state.data.filter(isSim).length;
   if (!n) return "";
   const all = n === state.data.length;
-  return '<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ' +
-    (all ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300") +
-    '" title="Số liệu do hệ thống sinh ngẫu nhiên để demo, không phải số liệu thật">' + (all ? "Dữ liệu mô phỏng" : "Có dòng mô phỏng") + "</span>";
+  return '<span class="ml-2 px-1.5 py-0.5 rounded text-xs font-semibold ' +
+    (all ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300" : "bg-secondary text-muted") +
+    '" title="Số liệu do hệ thống sinh ngẫu nhiên để demo, không phải số liệu thật">' + (all ? "Mô phỏng" : "Có dòng mẫu") + "</span>";
 }
