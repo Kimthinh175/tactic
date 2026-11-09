@@ -1313,7 +1313,10 @@ function renderAiAnalysis() {
               <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">Thử và đo lại · #${idx + 1}</span>
             </div>
             <h4 class="font-bold text-foreground text-xs sm:text-sm">${escapeHtml(rec.title)}</h4>
-            <p class="text-xs text-muted leading-relaxed">Vì sao: ${escapeHtml(rec.why)} Đo thế nào: ${escapeHtml(rec.measure)}</p>
+            <div class="space-y-1 text-xs text-muted leading-relaxed pt-0.5">
+              <p><strong class="font-semibold text-foreground">Vì sao:</strong> ${escapeHtml(rec.why)}</p>
+              <p><strong class="font-semibold text-foreground">Đo thế nào:</strong> ${escapeHtml(rec.measure)}</p>
+            </div>
           </div>
         `;
         })
