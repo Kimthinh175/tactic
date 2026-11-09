@@ -1010,13 +1010,210 @@ function analyzeCampaignIntelligence() {
   const rangeHeader = result.prevStart
     ? `${result.start || '—'} → ${result.end || '—'} so với ${result.prevStart || '—'} → ${result.prevEnd || '—'}.`
     : `Giai đoạn đánh giá: từ ${result.start || '—'} đến ${result.end || '—'} (${result.coverage.current} ngày).`;
+  let statusColor = 'indigo';
+  if (result.complete && result.delta) {
+    const o = Math.abs(result.delta.orders || 0) <= result.threshold ? 0 : Math.sign(result.delta.orders || 0);
+    const c = Math.abs(result.delta.cpa || 0) <= result.threshold ? 0 : Math.sign(result.delta.cpa || 0);
+    if (o > 0 && c < 0) statusColor = 'emerald';
+    else if (o < 0 && c > 0) statusColor = 'rose';
+    else if ((o > 0 && c > 0) || (o < 0 && c < 0)) statusColor = 'amber';
+  }
+
   return {
-    statusLabel: result.conclusion, statusColor: 'indigo', trendMetrics: [],
+    statusLabel: result.conclusion,
+    statusColor,
+    rawResult: result,
+    rangeHeader,
+    driverText,
+    trendMetrics: [],
     trendSummary: `${rangeHeader}\nLuận điểm: ${result.conclusion}.${driverText}\nĐộ phủ: ${result.coverage.current}/${result.days} ngày.${result.prevStart ? ` Ngưỡng ít biến động: ±${result.threshold}% (quy ước).` : ' Đang trong giai đoạn máy học (< 7 ngày).'}\n${result.complete ? 'Luận cứ: ' + result.evidence.map(e=>e.text).join('\n') : 'Đang đánh giá trực tiếp số liệu từ ngày ' + (result.start || '—') + ' đến ' + (result.end || '—') + '; hệ thống sẽ kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.'}\nClick/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
     recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá giai đoạn máy học')}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'}))
   };
 }
 function analyzeCampaignIntelligenceOffline() { return analyzeCampaignIntelligence(); }
+
+// Render Structured Visual Content Blocks for Trend Summary
+function renderTrendBlocks(analysis) {
+  const res = analysis.rawResult;
+  if (!res) {
+    return `<div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed"><p class="font-medium">${escapeHtml(analysis.trendSummary)}</p></div>`;
+  }
+
+  // 1. Determine Tone styling for the Conclusion Card
+  let toneBorder = "border-indigo-200/80 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200";
+  let toneBadge = "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300";
+  let toneIcon = `<svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+  if (res.complete && res.delta) {
+    const o = Math.abs(res.delta.orders || 0) <= res.threshold ? 0 : Math.sign(res.delta.orders || 0);
+    const c = Math.abs(res.delta.cpa || 0) <= res.threshold ? 0 : Math.sign(res.delta.cpa || 0);
+    if (o > 0 && c < 0) {
+      toneBorder = "border-emerald-300/80 dark:border-emerald-800/80 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200";
+      toneBadge = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300";
+      toneIcon = `<svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+    } else if (o < 0 && c > 0) {
+      toneBorder = "border-rose-300/80 dark:border-rose-800/80 bg-rose-50/80 dark:bg-rose-950/40 text-rose-950 dark:text-rose-200";
+      toneBadge = "bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300";
+      toneIcon = `<svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+    } else if ((o > 0 && c > 0) || (o < 0 && c < 0)) {
+      toneBorder = "border-amber-300/80 dark:border-amber-800/80 bg-amber-50/80 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200";
+      toneBadge = "bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300";
+      toneIcon = `<svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+    }
+  }
+
+  // Khối 1: Chu kỳ so sánh & Độ phủ
+  const blockHeader = `
+    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs">
+      <div class="flex items-center space-x-2.5 min-w-0">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 text-sm font-bold">📅</span>
+        <div class="min-w-0">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">Chu kỳ so sánh</span>
+          <span class="font-bold text-slate-800 dark:text-slate-100 truncate block text-xs sm:text-sm">${escapeHtml(analysis.rangeHeader)}</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1.5 shrink-0 flex-wrap">
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${res.complete ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'}">
+          Độ phủ: ${res.coverage.current}/${res.days} ngày
+        </span>
+        ${res.prevStart ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">Ngưỡng: ±${res.threshold}% (quy ước)</span>` : `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Giai đoạn máy học</span>`}
+      </div>
+    </div>
+  `;
+
+  // Khối 2: Luận điểm cốt lõi (Core Verdict Card)
+  const blockVerdict = `
+    <div class="p-4 rounded-xl border ${toneBorder} shadow-xs">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider">
+          ${toneIcon}
+          <span>Luận điểm</span>
+        </div>
+        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${toneBadge}">Kết luận xu hướng</span>
+      </div>
+      <div class="text-base sm:text-lg font-black tracking-tight leading-snug">
+        ${escapeHtml(res.conclusion)}
+      </div>
+    </div>
+  `;
+
+  // Khối 3: Phân rã biến động CPA (Root-Cause Driver)
+  let blockDriver = '';
+  if (res.complete && res.driver?.driverSummary) {
+    blockDriver = `
+      <div class="p-3.5 rounded-xl bg-gradient-to-r from-indigo-50/80 via-white to-purple-50/60 dark:from-indigo-950/40 dark:via-slate-800/60 dark:to-purple-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
+            <span class="text-sm">🔬</span>
+            <span>Phân rã biến động CPA (CPA = CPC ÷ CVR)</span>
+          </div>
+          <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">Công thức chuẩn</span>
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
+          ${escapeHtml(res.driver.driverSummary)}
+        </p>
+      </div>
+    `;
+  }
+
+  // Khối 4: Luận cứ số liệu chi tiết (Evidence Grid Cards)
+  let blockEvidence = '';
+  if (res.complete && Array.isArray(res.evidence) && res.evidence.length > 0) {
+    const metricIcons = {
+      cost: '💰',
+      orders: '📦',
+      cpa: '🏷️',
+      cpc: '💵',
+      cvr: '🔄',
+      clickReach: '🎯'
+    };
+    const metricNames = {
+      cost: 'Chi phí/ngày',
+      orders: 'Số đơn/ngày',
+      cpa: 'CPA (Giá/đơn)',
+      cpc: 'CPC (Giá/click)',
+      cvr: 'CVR (Tỷ lệ đơn)',
+      clickReach: 'Click/reach'
+    };
+
+    const cards = res.evidence.map((ev) => {
+      const deltaVal = res.delta?.[ev.id];
+      let deltaBadge = '';
+      if (deltaVal !== null && deltaVal !== undefined && isFinite(deltaVal)) {
+        const isGood = ['orders', 'cvr', 'clickReach'].includes(ev.id) ? deltaVal > 0 : deltaVal < 0;
+        const color = Math.abs(deltaVal) <= res.threshold
+          ? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600'
+          : isGood
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+        const sign = deltaVal > 0 ? '+' : '';
+        deltaBadge = `<span class="text-[11px] font-bold px-2 py-0.5 rounded border ${color}">${sign}${deltaVal.toLocaleString('vi-VN', {maximumFractionDigits: 2})}%</span>`;
+      }
+
+      return `
+        <div class="p-3 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/70 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center space-x-1.5">
+              <span>${metricIcons[ev.id] || '📌'}</span>
+              <span>${metricNames[ev.id] || ev.id}</span>
+            </span>
+            ${deltaBadge}
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+            ${escapeHtml(ev.text)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    blockEvidence = `
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <span class="flex items-center space-x-1.5">
+            <span>📊</span>
+            <span>Luận cứ số liệu chi tiết</span>
+          </span>
+          <span class="text-[10px] font-normal lowercase text-slate-400">đối soát giữa 2 kỳ</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          ${cards}
+        </div>
+      </div>
+    `;
+  } else if (!res.complete) {
+    blockEvidence = `
+      <div class="p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/40 text-xs text-purple-900 dark:text-purple-200">
+        <div class="font-bold mb-1 flex items-center space-x-1.5">
+          <span>⏱️</span>
+          <span>Đang trong giai đoạn máy học (< 7 ngày)</span>
+        </div>
+        <p class="leading-relaxed text-purple-800/90 dark:text-purple-300">
+          Đang đánh giá trực tiếp số liệu từ ngày ${escapeHtml(res.start || '—')} đến ${escapeHtml(res.end || '—')} (${res.coverage.current} ngày). Hệ thống sẽ tự động kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.
+        </p>
+      </div>
+    `;
+  }
+
+  // Khối 5: Lưu ý kỹ thuật & Giới hạn dữ liệu (Disclaimers Box)
+  const blockDisclaimer = `
+    <div class="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/40 text-[11px] text-slate-500 dark:text-slate-400 flex items-start space-x-2">
+      <span class="text-xs shrink-0 mt-0.5">💡</span>
+      <span class="leading-relaxed">
+        <strong class="font-semibold text-slate-600 dark:text-slate-300">Lưu ý kỹ thuật:</strong> Click/reach không phải CTR (click/lượt hiển thị). Tổng reach theo ngày không phải số người duy nhất của cả kỳ. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.
+      </span>
+    </div>
+  `;
+
+  return `
+    <div class="space-y-3">
+      ${blockHeader}
+      ${blockVerdict}
+      ${blockDriver}
+      ${blockEvidence}
+      ${blockDisclaimer}
+    </div>
+  `;
+}
 
 // Render AI Analysis Section in UI
 function renderAiAnalysis() {
@@ -1032,7 +1229,12 @@ function renderAiAnalysis() {
       elStatus.className = "text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
     }
     if (elTrendSummary) {
-      elTrendSummary.innerText = "Chưa có dữ liệu chiến dịch. Hệ thống AI và bộ chẩn đoán phễu sẽ tự động kích hoạt ngay khi bạn nhập từ 2 ngày số liệu trở lên.";
+      elTrendSummary.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed flex items-start space-x-3">
+          <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+          <p class="flex-1 font-medium">Chưa có dữ liệu chiến dịch. Hệ thống AI và bộ chẩn đoán phễu sẽ tự động kích hoạt ngay khi bạn nhập từ 2 ngày số liệu trở lên.</p>
+        </div>
+      `;
     }
     if (containerMetrics) {
       containerMetrics.innerHTML = `<span class="text-xs text-slate-400 italic">Nhập số liệu để AI phân tích % biến động giữa các chu kỳ.</span>`;
@@ -1104,7 +1306,7 @@ function renderAiAnalysis() {
   }
 
   if (elTrendSummary) {
-    elTrendSummary.innerText = analysis.trendSummary;
+    elTrendSummary.innerHTML = renderTrendBlocks(analysis);
   }
 
   // Trend Metric Badges
