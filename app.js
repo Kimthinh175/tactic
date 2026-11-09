@@ -1217,6 +1217,29 @@ function renderTrendBlocks(analysis) {
   `;
 }
 
+function renderAiRecommendationsSkeleton() {
+  return [1, 2, 3]
+    .map(
+      (idx) => `
+      <div class="rec-card-${idx} p-4 rounded-xl border border-border bg-surface-subtle space-y-3 animate-pulse">
+        <div class="flex items-center justify-between gap-2">
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping"></span>
+            <span>AI đang phân tích #${idx}</span>
+          </span>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-md w-16"></div>
+        </div>
+        <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-md w-3/4"></div>
+        <div class="space-y-2 pt-0.5">
+          <div class="h-3 bg-gray-200/80 dark:bg-gray-700/80 rounded w-full"></div>
+          <div class="h-3 bg-gray-200/80 dark:bg-gray-700/80 rounded w-4/5"></div>
+        </div>
+      </div>
+    `
+    )
+    .join("");
+}
+
 // Render AI Analysis Section in UI
 function renderAiAnalysis() {
   const filtered = getFilteredData();
@@ -1241,34 +1264,7 @@ function renderAiAnalysis() {
       containerMetrics.innerHTML = "";
     }
     if (containerRecs) {
-      containerRecs.innerHTML = `
-        <div class="rec-empty-1 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold text-primary">1. Khởi tạo dữ&nbsp;liệu</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#1</span>
-          </div>
-          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Nhập số liệu hoặc nạp 14 ngày&nbsp;mẫu</h4>
-          <p class="text-xs text-muted leading-relaxed">Điền Tiếp cận, Lượt nhấp, Chi phí và Đơn hàng theo ngày ở thanh nhập nhanh bên dưới hoặc dán từ bảng tính&nbsp;Excel.</p>
-        </div>
-
-        <div class="rec-empty-2 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold text-primary">2. Tự động hóa&nbsp;KPI</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#2</span>
-          </div>
-          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Tự động tính Click/reach, CPC,&nbsp;CPA</h4>
-          <p class="text-xs text-muted leading-relaxed">Hệ thống tức thời tính toán tỷ lệ chuyển đổi, chi phí trên mỗi đơn và đánh dấu ngày có CPA tốt nhất hoặc cao&nbsp;nhất.</p>
-        </div>
-
-        <div class="rec-empty-3 p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold text-primary">3. Chẩn đoán nhân quả &amp;&nbsp;AI</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">#3</span>
-          </div>
-          <h4 class="font-semibold text-foreground text-xs sm:text-sm">Phân rã phễu và đề xuất 3 hành&nbsp;động</h4>
-          <p class="text-xs text-muted leading-relaxed">Xác định chính xác CPA biến động do giá thầu (CPC) hay tỷ lệ chốt đơn (CVR), kết hợp Gemini AI gợi ý hành động thực&nbsp;chiến.</p>
-        </div>
-      `;
+      containerRecs.innerHTML = renderAiRecommendationsSkeleton();
     }
     return;
   }
@@ -1296,22 +1292,33 @@ function renderAiAnalysis() {
     containerMetrics.innerHTML = "";
   }
 
-  // Render 03 Actionable Recommendations
+  // 03 Khuyến nghị hành động:
+  // Khi AI chưa phân tích xong (đang tải hoặc chưa có kết quả AI cho kỳ này):
+  // Hiện skeleton thôi, KHÔNG hiện nội dung offline nữa!
+  const snapshot = analysisSnapshot();
+  const key = JSON.stringify(snapshot);
+  const cached = state.geminiAnalysisResult;
+  const isAiReady = Boolean(cached && cached.key === key && Array.isArray(cached.recommendations) && cached.recommendations.length === 3);
+
   if (containerRecs) {
-    containerRecs.innerHTML = analysis.recommendations
-      .map((rec, idx) => {
-        return `
-        <div class="rec-card-${idx + 1} p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold text-primary">${escapeHtml(rec.pillar)}</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">${escapeHtml(rec.action || "Thực hiện")} · #${idx + 1}</span>
+    if (state.isGeminiLoading || !isAiReady) {
+      containerRecs.innerHTML = renderAiRecommendationsSkeleton();
+    } else {
+      containerRecs.innerHTML = cached.recommendations
+        .map((rec, idx) => {
+          return `
+          <div class="rec-card-${idx + 1} p-3.5 rounded-lg border border-border bg-surface-subtle space-y-1.5 transition-all">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-primary">${idx + 1}. AI khuyến nghị</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-foreground">Thử và đo lại · #${idx + 1}</span>
+            </div>
+            <h4 class="font-bold text-foreground text-xs sm:text-sm">${escapeHtml(rec.title)}</h4>
+            <p class="text-xs text-muted leading-relaxed">Vì sao: ${escapeHtml(rec.why)} Đo thế nào: ${escapeHtml(rec.measure)}</p>
           </div>
-          <h4 class="font-bold text-foreground text-xs sm:text-sm">${escapeHtml(rec.title)}</h4>
-          <p class="text-xs text-muted leading-relaxed">${escapeHtml(rec.desc)}</p>
-        </div>
-      `;
-      })
-      .join("");
+        `;
+        })
+        .join("");
+    }
   }
 
   updateAiButtonState();
@@ -1908,6 +1915,7 @@ async function runGeminiAiAnalysis() {
   state.isGeminiLoading = true;
   if (btn) btn.disabled = true;
   if (label) label.textContent = "Đang tạo gợi ý…";
+  renderAiAnalysis(); // Chuyển sang skeleton ngay khi bắt đầu phân tích
   try {
     const response = await fetch('/api/recommendations', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows:state.data,days:snapshot.days,threshold:snapshot.threshold}),signal:AbortSignal.timeout(25000)});
     if (!response.ok) throw new Error('AI unavailable');
@@ -1918,17 +1926,14 @@ async function runGeminiAiAnalysis() {
     const aiData = {key, recommendations: result.recommendations, contextId: result.contextId, driver: result.driver, savedAt: Date.now()};
     state.geminiAnalysisResult = aiData;
     saveAiRecommendationsToStorage(key, aiData);
-    renderAiAnalysis();
-    updateAiButtonState();
     showToast('Đã nhận 3 gợi ý AI (đã lưu bộ nhớ để tải lại không tốn token).', 'success');
   } catch {
     state.geminiAnalysisResult = null;
-    renderAiAnalysis();
-    updateAiButtonState();
-    showToast('AI chưa khả dụng. Đang dùng 3 gợi ý theo quy tắc.', 'info');
+    showToast('AI chưa khả dụng. Vui lòng kiểm tra kết nối và thử lại.', 'info');
   } finally {
     state.isGeminiLoading = false;
     if (btn) btn.disabled = false;
+    renderAiAnalysis();
     updateAiButtonState();
   }
 }
