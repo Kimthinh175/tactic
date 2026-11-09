@@ -322,16 +322,43 @@ function createServer({fetchAI = fetch, env = process.env} = {}) {
       }
     }
 
-    const file = publicFiles[req.url?.split('?')[0]];
-    if (!file || req.method !== 'GET') {
+    // Download Source ZIP routes
+    const pathname = urlObj.pathname;
+    if ((pathname === '/tactic-submission.zip' || pathname === '/download-source' || pathname === '/source.zip' || pathname === '/download') && (req.method === 'GET' || req.method === 'HEAD')) {
+      const zipPath = path.join(__dirname, 'tactic-submission.zip');
+      try {
+        const stat = fsSync.statSync(zipPath);
+        res.writeHead(200, {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': 'attachment; filename="tactic-submission.zip"',
+          'Content-Length': stat.size,
+          'Cache-Control': 'no-cache'
+        });
+        if (req.method === 'HEAD') {
+          return res.end();
+        }
+        return fsSync.createReadStream(zipPath).pipe(res);
+      } catch (err) {
+        return json(404, { error: 'Không tìm thấy file source ZIP' });
+      }
+    }
+
+    const file = publicFiles[pathname];
+    if (!file || (req.method !== 'GET' && req.method !== 'HEAD')) {
       res.writeHead(404);
       return res.end();
     }
     try {
-      const content = await fs.readFile(path.join(__dirname, file));
+      const filePath = path.join(__dirname, file);
+      const stat = await fs.stat(filePath);
       res.writeHead(200, {
-        'Content-Type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html'
+        'Content-Type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',
+        'Content-Length': stat.size
       });
+      if (req.method === 'HEAD') {
+        return res.end();
+      }
+      const content = await fs.readFile(filePath);
       res.end(content);
     } catch {
       res.writeHead(500);

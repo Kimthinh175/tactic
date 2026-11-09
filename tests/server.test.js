@@ -89,3 +89,30 @@ test('chat endpoint rejects banned phrases and ungrounded numbers',async t=>{
  assert.equal(res.status, 502);
 });
 
+test('source ZIP download endpoints and HEAD request support', async t => {
+  const server = createServer();
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  t.after(() => new Promise(r => server.close(r)));
+  const port = server.address().port;
+
+  // GET /tactic-submission.zip
+  const resZip = await fetch(`http://127.0.0.1:${port}/tactic-submission.zip`);
+  assert.equal(resZip.status, 200);
+  assert.equal(resZip.headers.get('content-type'), 'application/zip');
+  assert.ok(resZip.headers.get('content-disposition').includes('attachment; filename="tactic-submission.zip"'));
+  const buf = await resZip.arrayBuffer();
+  assert.ok(buf.byteLength > 10000);
+
+  // HEAD /download-source
+  const resHead = await fetch(`http://127.0.0.1:${port}/download-source`, { method: 'HEAD' });
+  assert.equal(resHead.status, 200);
+  assert.equal(resHead.headers.get('content-type'), 'application/zip');
+  assert.equal(Number(resHead.headers.get('content-length')), buf.byteLength);
+
+  // HEAD / (index.html)
+  const resHeadIndex = await fetch(`http://127.0.0.1:${port}/`, { method: 'HEAD' });
+  assert.equal(resHeadIndex.status, 200);
+  assert.equal(resHeadIndex.headers.get('content-type'), 'text/html');
+});
+
+

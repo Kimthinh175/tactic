@@ -145,6 +145,21 @@
           <span class="sm:hidden">Báo cáo</span>
         </button>
 
+        <!-- Source ZIP Download Link (Vibe Coding 2026 Submission) -->
+        <a
+          href="/tactic-submission.zip"
+          download="tactic-submission.zip"
+          id="btn-download-source-zip"
+          title="Tải gói mã nguồn dự thi Source ZIP (.zip) kèm README &amp; Bảng kiểm thử"
+          class="h-9 px-2.5 sm:px-3 rounded-lg btn-secondary text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <svg class="w-3.5 h-3.5 text-muted shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span class="hidden sm:inline">Tải Source ZIP</span>
+          <span class="sm:hidden">ZIP</span>
+        </a>
+
         <!-- Dark/Light Theme Toggle (36x36px, text-xs for uniform header button rule) -->
         <button
           type="button"
@@ -953,16 +968,29 @@
 
       <!-- Modal Footer -->
       <div class="p-4 sm:px-6 border-t border-border-strong bg-app flex flex-wrap items-center justify-between gap-2.5">
-        <button
-          type="button"
-          onclick="exportToCsv()"
-          class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
-        >
-          <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          <span>Tải tệp CSV (.csv)</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="exportToCsv()"
+            class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>Tải tệp CSV (.csv)</span>
+          </button>
+          <a
+            href="/tactic-submission.zip"
+            download="tactic-submission.zip"
+            class="h-9 px-3.5 rounded-lg btn-secondary text-xs font-medium inline-flex items-center gap-1.5"
+            title="Tải gói mã nguồn dự thi Source ZIP (.zip)"
+          >
+            <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>Tải Source ZIP (.zip)</span>
+          </a>
+        </div>
 
         <div class="flex items-center gap-2">
           <button
