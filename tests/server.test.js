@@ -112,13 +112,23 @@ test('source ZIP download endpoints and HEAD request support', async t => {
   // HEAD / (index.html)
   const resHeadIndex = await fetch(`http://127.0.0.1:${port}/`, { method: 'HEAD' });
   assert.equal(resHeadIndex.status, 200);
-  assert.equal(resHeadIndex.headers.get('content-type'), 'text/html');
+  assert.ok(resHeadIndex.headers.get('content-type').includes('text/html'));
 
   // HEAD /demo-video.mp4
   const resVideo = await fetch(`http://127.0.0.1:${port}/demo-video.mp4`, { method: 'HEAD' });
   assert.equal(resVideo.status, 200);
   assert.equal(resVideo.headers.get('content-type'), 'video/mp4');
   assert.equal(resVideo.headers.get('accept-ranges'), 'bytes');
+
+  // GET /favicon.svg
+  const resFavicon = await fetch(`http://127.0.0.1:${port}/favicon.svg`);
+  assert.equal(resFavicon.status, 200);
+  assert.equal(resFavicon.headers.get('content-type'), 'image/svg+xml');
+
+  // GET /logo.svg
+  const resLogo = await fetch(`http://127.0.0.1:${port}/logo.svg`);
+  assert.equal(resLogo.status, 200);
+  assert.equal(resLogo.headers.get('content-type'), 'image/svg+xml');
 });
 
 

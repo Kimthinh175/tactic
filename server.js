@@ -26,7 +26,13 @@ const publicFiles = {
   '/app.js': 'app.js',
   '/analysis.js': 'analysis.js',
   '/styles.css': 'styles.css',
-  '/sample-data.js': 'sample-data.js'
+  '/sample-data.js': 'sample-data.js',
+  '/favicon.svg': 'favicon.svg',
+  '/favicon.png': 'favicon.png',
+  '/favicon.ico': 'favicon.ico',
+  '/logo.svg': 'logo.svg',
+  '/logo-icon.svg': 'logo-icon.svg',
+  '/logo.png': 'logo.png'
 };
 
 const BANNED_PATTERNS = [
@@ -371,9 +377,19 @@ function createServer({fetchAI = fetch, env = process.env} = {}) {
     try {
       const filePath = path.join(__dirname, file);
       const stat = await fs.stat(filePath);
+      const mimeMap = {
+        '.js': 'text/javascript; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.html': 'text/html; charset=utf-8',
+        '.svg': 'image/svg+xml',
+        '.png': 'image/png',
+        '.ico': 'image/x-icon'
+      };
+      const ext = path.extname(file).toLowerCase();
       res.writeHead(200, {
-        'Content-Type': file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',
-        'Content-Length': stat.size
+        'Content-Type': mimeMap[ext] || 'text/html; charset=utf-8',
+        'Content-Length': stat.size,
+        'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400'
       });
       if (req.method === 'HEAD') {
         return res.end();

@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tactic AdPulse — Bảng điều khiển KPI Chiến dịch</title>
   <meta name="description" content="Bảng điều khiển KPI chiến dịch quảng cáo, chẩn đoán phễu CPA = CPC ÷ CVR và khuyến nghị tối ưu ngân sách dành cho Performance Marketer." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='bold' fill='white' text-anchor='middle'>T</text></svg>" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
 
   <!-- Inter Font (Single typeface across entire app — Rule T1) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -73,18 +75,23 @@
       <!-- Brand Identity + Active Campaign Context -->
       <div class="flex items-center justify-between lg:justify-start gap-3 min-w-0 flex-1">
         <div class="flex items-center gap-2.5 shrink-0">
-          <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm select-none">
-            T
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-sm tracking-tight text-foreground">Tactic AdPulse</span>
-              <span id="campaign-date-range-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-muted tabular-nums">
-                Chưa có dữ liệu
-              </span>
+          <a href="/" class="flex items-center gap-2.5 group transition-transform hover:scale-[1.01]" title="Tactic AdPulse Dashboard">
+            <div class="w-8 h-8 rounded-lg overflow-hidden shadow-sm shrink-0">
+              <img src="/logo-icon.svg" alt="Tactic AdPulse Logo" class="w-full h-full object-contain" />
             </div>
-            <p class="text-xs text-muted hidden sm:block">Chẩn đoán phễu &amp; tối ưu&nbsp;CPA</p>
-          </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-sm tracking-tight text-foreground flex items-center gap-0.5">
+                  <span>Tactic</span><span class="text-blue-600 dark:text-blue-400">AdPulse</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" title="Hệ thống trực tuyến"></span>
+                </span>
+                <span id="campaign-date-range-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-muted tabular-nums">
+                  Chưa có dữ liệu
+                </span>
+              </div>
+              <p class="text-[11px] text-muted hidden sm:block font-medium">Chẩn đoán phễu &amp; tối ưu&nbsp;CPA</p>
+            </div>
+          </a>
         </div>
 
         <div class="h-5 w-px bg-border hidden sm:block shrink-0"></div>

@@ -12,37 +12,37 @@ VOICE_SCRIPTS = [
     {
         "id": "clip0_intro",
         "time": 0.5,
-        "text": "Chào mừng Ban giám khảo đến với bản demo Tactic AdPulse, Đề số 8, Bảng A cuộc thi Vibe Coding 2026."
+        "text": "Chào mừng Ban giám khảo đến với Tactic AdPulse, Dashboard KPI chiến dịch và chẩn đoán phễu CPA chuyên sâu. Sản phẩm dự thi Đề số 8, Bảng A cuộc thi Vibe Coding 2026 của đội thi Tactic Team."
     },
     {
         "id": "clip1_feat1",
-        "time": 10.0,
-        "text": "Tính năng 1: Nhập liệu đa phương thức. Hỗ trợ nhập từng ngày, nạp nhanh mẫu 14 ngày, bảng nhập hàng loạt đa dòng và trích xuất tự động từ file Excel, Word, PDF hoặc dán ảnh OCR."
+        "time": 16.5,
+        "text": "Tính năng 1: Nhập liệu đa phương thức. Hỗ trợ nhập từng ngày, nạp nhanh mẫu 14 ngày, bảng nhập hàng loạt đa dòng và tự động trích xuất từ file Excel, Word, PDF hoặc dán ảnh báo cáo với Gemini Vision OCR."
     },
     {
         "id": "clip2_feat2",
-        "time": 25.5,
-        "text": "Tính năng 2: Tự động hóa bốn chỉ số KPI cốt lõi gồm CTR, CPC, CPA và CVR. Đánh dấu ngày CPA tối ưu nhất và trực quan hóa biểu đồ tương tác đa trục."
+        "time": 33.5,
+        "text": "Tính năng 2: Tự động hóa bốn chỉ số KPI gồm CTR, CPC, CPA và CVR. Đánh dấu ngày CPA tối ưu nhất và trực quan hóa biểu đồ tương tác đa trục."
     },
     {
         "id": "clip3_feat3",
-        "time": 41.0,
-        "text": "Tính năng 3: Chẩn đoán phễu nhân quả. Tự động đối chiếu chu kỳ và phân rã biến động CPA theo công thức CPA bằng CPC chia CVR, phân loại vào bốn góc phần tư xu hướng."
+        "time": 48.0,
+        "text": "Tính năng 3: Chẩn đoán phễu nhân quả. Tự động đối chiếu chu kỳ và phân rã biến động CPA theo công thức toán học CPA bằng CPC chia CVR, phân loại vào bốn góc phần tư xu hướng."
     },
     {
         "id": "clip4_feat4",
-        "time": 55.0,
-        "text": "Tính năng 4: Tích hợp trợ lý AI Google Gemini 3.8 Flash, đề xuất ba khuyến nghị thực chiến chia hai dòng rõ ràng Vì sao và Đo thế nào, cùng trợ lý hỏi đáp số liệu thời gian thực."
+        "time": 62.0,
+        "text": "Tính năng 4: Tích hợp trợ lý AI Google Gemini 3.8 Flash, đề xuất ba khuyến nghị thực chiến chia hai dòng in đậm Vì sao và Đo thế nào, cùng trợ lý hỏi đáp số liệu RAM Context Cache."
     },
     {
         "id": "clip5_feat5",
-        "time": 69.5,
+        "time": 76.0,
         "text": "Tính năng 5: Xuất báo cáo đa kênh, sao chép tóm tắt gửi nhanh qua Zalo, Slack, tải tệp CSV và tải trọn bộ gói mã nguồn dự thi Source ZIP chỉ với một cú click."
     },
     {
         "id": "clip6_outro",
-        "time": 82.5,
-        "text": "Tactic AdPulse đã hoàn thành trọn vẹn 5 tính năng, vượt qua toàn bộ ca kiểm thử thực tế và sẵn sàng triển khai. Cảm ơn Ban giám khảo."
+        "time": 89.0,
+        "text": "Tactic AdPulse đã hoàn thành trọn vẹn 5 tính năng, vượt qua toàn bộ 6 ca kiểm thử thực tế và sẵn sàng triển khai thực chiến. Kính chúc Ban giám khảo đánh giá thành công. Xin chân thành cảm ơn!"
     }
 ]
 
@@ -51,17 +51,16 @@ def generate_voice_clips():
     for item in VOICE_SCRIPTS:
         out_mp3 = os.path.join(AUDIO_DIR, f"{item['id']}.mp3")
         out_wav = os.path.join(AUDIO_DIR, f"{item['id']}.wav")
-        if not os.path.exists(out_wav):
-            tts = gTTS(item["text"], lang="vi", slow=False)
-            tts.save(out_mp3)
-            # Speed up slightly (1.12x) for energetic, crisp pacing and convert to 44100Hz mono WAV
-            subprocess.run([
-                "ffmpeg", "-y", "-i", out_mp3,
-                "-filter:a", "atempo=1.12",
-                "-ar", "44100", "-ac", "1",
-                out_wav
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            print(f"Generated: {out_wav}")
+        tts = gTTS(item["text"], lang="vi", slow=False)
+        tts.save(out_mp3)
+        # Speed up slightly (1.18x) for crisp, energetic pacing and convert to 44100Hz mono WAV
+        subprocess.run([
+            "ffmpeg", "-y", "-i", out_mp3,
+            "-filter:a", "atempo=1.18",
+            "-ar", "44100", "-ac", "1",
+            out_wav
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print(f"Generated: {out_wav}")
 
 def generate_ambient_music(duration=90.0, sample_rate=44100):
     print("Generating ambient background synth pad with numpy...")
@@ -141,12 +140,12 @@ def mix_final_audio():
     # Mix ambient pad (0:a) with all voice clips
     filter_complex = f"{mix_line}[0:a]{mix_sources}amix=inputs={total_sources}:duration=first:dropout_transition=2,volume=1.2[outa]"
     cmd.extend(["-filter_complex", filter_complex, "-map", "[outa]"])
-    cmd.extend(["-t", "90.00", "-ar", "44100", "-ac", "2", os.path.join(AUDIO_DIR, "final_soundtrack_90s.mp3")])
+    cmd.extend(["-t", "103.00", "-ar", "44100", "-ac", "2", os.path.join(AUDIO_DIR, "final_soundtrack_90s.mp3")])
     
     subprocess.run(cmd, check=True)
     print(f"Final audio soundtrack created: {os.path.join(AUDIO_DIR, 'final_soundtrack_90s.mp3')}")
 
 if __name__ == "__main__":
     generate_voice_clips()
-    generate_ambient_music(90.0)
+    generate_ambient_music(103.0)
     mix_final_audio()

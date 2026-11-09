@@ -21,7 +21,7 @@ ffmpeg -y \
   -c:a aac \
   -b:a 192k \
   -ar 44100 \
-  -t 90.00 \
+  -t 103.00 \
   -movflags +faststart \
   "$OUTPUT_MP4"
 
@@ -32,5 +32,5 @@ echo "✅ Video demo hoàn tất thành công!"
 echo "File chính: $OUTPUT_MP4"
 echo "File public: $PUBLIC_MP4"
 echo "Kích thước: $(ls -lh "$OUTPUT_MP4" | awk '{print $5}')"
-echo "Thời lượng: 90.00 giây (01:30)"
+echo "Thời lượng: 103.00 giây (01:43)"
 echo "=========================================================="

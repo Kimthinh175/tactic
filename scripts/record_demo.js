@@ -231,7 +231,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
     intro.className = 'demo-splash-screen';
     intro.innerHTML = `
       <div style="max-width: 720px; animation: fadeIn 0.8s ease;">
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.2); border: 1px solid #3b82f6; padding: 6px 16px; border-radius: 9999px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 16px;">
+          <div style="position: relative; width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%); border-radius: 50%;">
+            <img src="/logo-icon.svg" style="width: 68px; height: 68px; filter: drop-shadow(0 0 20px rgba(56,189,248,0.75));" alt="Tactic Logo" />
+          </div>
+        </div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.2); border: 1px solid #3b82f6; padding: 6px 16px; border-radius: 9999px; margin-bottom: 18px;">
           <span style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8;"></span>
           <span style="font-size: 12px; font-weight: 600; color: #93c5fd; letter-spacing: 0.5px; text-transform: uppercase;">Cuộc thi Vibe Coding 2026 · Bảng A</span>
         </div>
@@ -275,9 +280,9 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
     }
   };
 
-  console.log('🎬 00:00 - 00:10.0: Đoạn giới thiệu (Intro Splash)...');
+  console.log('🎬 00:00 - 00:16.0: Đoạn giới thiệu (Intro Splash)...');
   await setProgress(5);
-  await waitUntilSecond(9.4);
+  await waitUntilSecond(15.4);
 
   // Fade out Intro overlay
   await page.evaluate(() => {
@@ -287,7 +292,7 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
       setTimeout(() => intro.remove(), 600);
     }
   });
-  await waitUntilSecond(10.0);
+  await waitUntilSecond(16.0);
 
   // =========================================================================
   // SCENE 1: TÍNH NĂNG 1 - NHẬP LIỆU ĐA PHƯƠNG THỨC (10.0s -> 25.5s, ~15.5s)
@@ -338,12 +343,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   await smoothClick(page, '#bulk-modal button:has-text("Hủy bỏ")', 500);
   await page.waitForTimeout(1000);
   await setProgress(27);
-  await waitUntilSecond(25.5);
+  await waitUntilSecond(33.0);
 
   // =========================================================================
-  // SCENE 2: TÍNH NĂNG 2 - TỰ ĐỘNG HÓA KPI & BIỂU ĐỒ (25.5s -> 41.0s, ~15.5s)
+  // SCENE 2: TÍNH NĂNG 2 - TỰ ĐỘNG HÓA KPI & BIỂU ĐỒ (33.0s -> 47.5s, ~14.5s)
   // =========================================================================
-  console.log('🎬 00:25.5 - 00:41.0: TÍNH NĂNG 2 — Tự động hóa KPI & Biểu đồ tương tác...');
+  console.log('🎬 00:33.0 - 00:47.5: TÍNH NĂNG 2 — Tự động hóa KPI & Biểu đồ tương tác...');
   await updateHUD(page, {
     featIndex: 2,
     featBadge: 'TÍNH NĂNG 2 / 5',
@@ -382,12 +387,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   await smoothMove(page, { x: 780, y: 380 }, 500);
   await page.waitForTimeout(1000);
   await setProgress(45);
-  await waitUntilSecond(41.0);
+  await waitUntilSecond(47.5);
 
   // =========================================================================
-  // SCENE 3: TÍNH NĂNG 3 - CHẨN ĐOÁN PHỄU CPA = CPC ÷ CVR (41.0s -> 55.0s, ~14s)
+  // SCENE 3: TÍNH NĂNG 3 - CHẨN ĐOÁN PHỄU CPA = CPC ÷ CVR (47.5s -> 61.5s, ~14s)
   // =========================================================================
-  console.log('🎬 00:41.0 - 00:55.0: TÍNH NĂNG 3 — Chẩn đoán phễu nhân quả CPA = CPC ÷ CVR...');
+  console.log('🎬 00:47.5 - 00:61.5: TÍNH NĂNG 3 — Chẩn đoán phễu nhân quả CPA = CPC ÷ CVR...');
   await updateHUD(page, {
     featIndex: 3,
     featBadge: 'TÍNH NĂNG 3 / 5',
@@ -419,12 +424,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   await page.locator('#analysis-days').selectOption('14');
   await page.waitForTimeout(1400);
   await setProgress(60);
-  await waitUntilSecond(55.0);
+  await waitUntilSecond(61.5);
 
   // =========================================================================
-  // SCENE 4: TÍNH NĂNG 4 - TRỢ LÝ AI GEMINI 3.8 FLASH (55.0s -> 69.5s, ~14.5s)
+  // SCENE 4: TÍNH NĂNG 4 - TRỢ LÝ AI GEMINI 3.8 FLASH (61.5s -> 75.5s, ~14s)
   // =========================================================================
-  console.log('🎬 00:55.0 - 00:69.5: TÍNH NĂNG 4 — Trợ lý AI Gemini 3.8 Flash & Khuyến nghị...');
+  console.log('🎬 00:61.5 - 00:75.5: TÍNH NĂNG 4 — Trợ lý AI Gemini 3.8 Flash & Khuyến nghị...');
   await updateHUD(page, {
     featIndex: 4,
     featBadge: 'TÍNH NĂNG 4 / 5',
@@ -466,12 +471,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   await smoothClick(page, '#btn-submit-ai-chat', 400);
   await page.waitForTimeout(2000);
   await setProgress(77);
-  await waitUntilSecond(69.5);
+  await waitUntilSecond(75.5);
 
   // =========================================================================
-  // SCENE 5: TÍNH NĂNG 5 - XUẤT BÁO CÁO & TẢI SOURCE ZIP (69.5s -> 82.5s, ~13s)
+  // SCENE 5: TÍNH NĂNG 5 - XUẤT BÁO CÁO & TẢI SOURCE ZIP (75.5s -> 88.5s, ~13s)
   // =========================================================================
-  console.log('🎬 00:69.5 - 00:82.5: TÍNH NĂNG 5 — Xuất báo cáo đa kênh & Tải tệp...');
+  console.log('🎬 00:75.5 - 00:88.5: TÍNH NĂNG 5 — Xuất báo cáo đa kênh & Tải tệp...');
   await updateHUD(page, {
     featIndex: 5,
     featBadge: 'TÍNH NĂNG 5 / 5',
@@ -506,12 +511,12 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   await smoothClick(page, '#export-modal button:has-text("Đóng")', 450);
   await page.waitForTimeout(800);
   await setProgress(91);
-  await waitUntilSecond(82.5);
+  await waitUntilSecond(88.5);
 
   // =========================================================================
-  // SCENE 6: OUTRO CARD (82.5s -> 90.5s, ~8s)
+  // SCENE 6: OUTRO CARD (88.5s -> 103.0s, ~14.5s)
   // =========================================================================
-  console.log('🎬 00:82.5 - 00:90.5: Đoạn kết (Outro Splash)...');
+  console.log('🎬 00:88.5 - 01:03.0: Đoạn kết (Outro Splash)...');
   await updateHUD(page, {
     featIndex: 6,
     featBadge: 'KẾT THÚC',
@@ -526,8 +531,10 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
     outro.style.opacity = '0';
     outro.innerHTML = `
       <div style="max-width: 740px;">
-        <div style="width: 56px; height: 56px; border-radius: 14px; background: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: white; margin-bottom: 18px; box-shadow: 0 0 20px rgba(37,99,235,0.6);">
-          T
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 18px;">
+          <div style="position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%); border-radius: 50%;">
+            <img src="/logo-icon.svg" style="width: 72px; height: 72px; filter: drop-shadow(0 0 24px rgba(56,189,248,0.85));" alt="Tactic Logo" />
+          </div>
         </div>
         <h2 style="font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
           TACTIC ADPULSE
@@ -561,7 +568,7 @@ async function updateHUD(page, { featIndex, featBadge, featTitle, featDesc }) {
   });
 
   await setProgress(100);
-  await waitUntilSecond(90.5);
+  await waitUntilSecond(103.0);
 
   // Close page and browser to finalize video
   console.log('🎥 Đang đóng trình duyệt và xuất tệp video thô...');
