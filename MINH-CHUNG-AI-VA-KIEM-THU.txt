@@ -1,0 +1,92 @@
+================================================================================
+MINH CHỨNG SỬ DỤNG AI & BẢNG KIỂM THỬ THỰC TẾ (BẢNG A)
+Cuộc thi Vibe Coding 2026 — Trường Cao đẳng FPT Polytechnic
+Đề tài: Tactic AdPulse Dashboard
+================================================================================
+
+PHẦN 1: BẢNG KIỂM THỬ THỰC TẾ (BẢNG A - TỐI THIỂU 6 CA KIỂM THỬ)
+Tất cả các ca kiểm thử đều được tự động hóa qua Playwright E2E và Node.js Test Runner:
+
+--------------------------------------------------------------------------------
+1. CA KIỂM THỬ BÌNH THƯỜNG #1 (TC01): Nhập số liệu 14 ngày & tự động tính KPI
+- Đầu vào: 14 bản ghi số liệu chiến dịch (Ngày, Tiếp cận, Nhấp, Chi phí, Đơn hàng).
+- Thao tác: Bấm "Nạp mẫu 14 ngày" hoặc nhập qua biểu mẫu nhanh.
+- Kỳ vọng:
+  + Tự động tính toán đúng: Click/reach = Clicks ÷ Reach, CPC = Cost ÷ Clicks, CPA = Cost ÷ Orders, CVR = Orders ÷ Clicks.
+  + Vẽ biểu đồ tương tác 2 trục (Trục trái: Reach/Clicks/Cost, Trục phải: Orders).
+  + Đối chiếu 2 chu kỳ 7 ngày gần nhất so với 7 ngày liền trước.
+- Kết quả thực tế: ĐẠT (PASS) — Kiểm thử tự động tại test 'bulk entry saves several days' và 'four decision quadrants'.
+
+2. CA KIỂM THỬ BÌNH THƯỜNG #2 (TC02): Import dữ liệu đa định dạng (Excel, Word, PDF, OCR Ảnh)
+- Đầu vào: File Excel (mau_kpi_chien_dich.xlsx), Word (.docx), PDF (.pdf), CSV và ảnh chụp màn hình bảng số liệu.
+- Thao tác: Kéo thả hoặc chọn tệp từ nút "Nhập tệp / Ảnh" hoặc bấm Ctrl+V dán ảnh từ clipboard.
+- Kỳ vọng: Hệ thống tự động phân tích vector ngữ nghĩa không gian (Vector Space Model) để nhận diện đúng các cột Ngày, Reach, Clicks, Chi phí, Đơn hàng và nạp 100% vào bảng số liệu.
+- Kết quả thực tế: ĐẠT (PASS) — Kiểm thử tự động tại test 'template download and multimodal file import' và 'screenshot image import triggers Gemini Vision OCR'.
+
+3. CA ĐẦU VÀO KHÔNG HỢP LỆ #1 (TC03): Dữ liệu chi phí hoặc đơn hàng số âm
+- Đầu vào: Bản ghi có Cost = -100 hoặc Orders = -5.
+- Thao tác: Nhập qua biểu mẫu đơn hoặc bảng nhập hàng loạt (Bulk entry).
+- Kỳ vọng: Hệ thống phát hiện dữ liệu vi phạm điều kiện tự nhiên, từ chối lưu vào sổ cái và hiển thị thông báo lỗi: "Số liệu phải không âm, hữu hạn".
+- Kết quả thực tế: ĐẠT (PASS) — Kiểm thử tự động tại test 'bulk entry saves several days and ignores negative data'.
+
+4. CA ĐẦU VÀO KHÔNG HỢP LỆ #2 (TC04): Lượt nhấp chuột lớn hơn Lượt tiếp cận (Clicks > Reach)
+- Đầu vào: Clicks = 200, Reach = 100.
+- Thao tác: Bấm nút "Lưu ngày này".
+- Kỳ vọng: Hệ thống đưa ra cảnh báo logic tiếp thị: "Số clicks đang lớn hơn Reach (Lượt tiếp cận). Bạn có chắc muốn lưu số liệu này?".
+- Kết quả thực tế: ĐẠT (PASS) — Giao diện chặn và yêu cầu xác nhận trước khi lưu.
+
+5. CA BIÊN #1 (TC05): Số đơn hàng bằng 0 (Tránh lỗi chia cho 0)
+- Đầu vào: Cost = 1.000.000đ, Orders = 0.
+- Thao tác: Lưu số liệu ngày này và xem thẻ KPI tổng quan.
+- Kỳ vọng: CPA (Cost ÷ Orders) và CVR (Orders ÷ Clicks) không được hiển thị NaN hoặc Infinity; phải hiển thị an toàn "Chưa xác định". Kết luận xu hướng ghi rõ "Chưa đủ dữ liệu so sánh".
+- Kết quả thực tế: ĐẠT (PASS) — Kiểm thử tự động tại test 'zero orders and missing days; backend validation'.
+
+6. CA SỰ CỐ / NGOẠI LỆ #2 (TC06): Mất kết nối API Gemini (Graceful Fallback & Skeleton)
+- Đầu vào: Chặn endpoint /api/recommendations (mô phỏng mất mạng, hết quota hoặc API sập).
+- Thao tác: Bấm nút "AI hỗ trợ cải thiện".
+- Kỳ vọng: Hệ thống không bị treo hoặc crash; hiển thị Skeleton loading quét mượt mà khi đang chờ, sau đó tự động bật thông báo "AI chưa khả dụng" và giữ nguyên kết luận toán học độc lập.
+- Kết quả thực tế: ĐẠT (PASS) — Kiểm thử tự động tại test 'input → evidence → persistence → export → AI fallback'.
+
+================================================================================
+PHẦN 2: MINH CHỨNG TÍCH HỢP AI (TỐI ĐA 5 ĐOẠN MINH CHỨNG THỰC TẾ)
+================================================================================
+
+MINH CHỨNG 1: Khuyến nghị AI gắn chặt nguyên nhân phễu CPA = CPC ÷ CVR
+- Đoạn hội thoại / Phản hồi JSON thực tế từ Gemini 3.8 Flash:
+  [
+    {
+      "title": "Tối ưu trang giỏ hàng và thanh toán trên di động",
+      "why": "CVR (%): 5,76 → 5,11; -11,32% (27/10–02/11 → 03/11–09/11)",
+      "measure": "Kiểm tra hành trình đặt hàng, đo lại CVR sau chu kỳ 7 ngày tiếp theo."
+    },
+    {
+      "title": "Thử nghiệm biến thể hình ảnh và thông điệp mới",
+      "why": "Click/reach (%): 2,16 → 2,10; -2,91% (27/10–02/11 → 03/11–09/11)",
+      "measure": "Thay một yếu tố sáng tạo, theo dõi biến động Click/reach và CPA."
+    },
+    {
+      "title": "Thiết lập mức trần CPA trước khi mở rộng ngân sách",
+      "why": "CPA: 44.924,05 → 58.393,26; 29,98% (27/10–02/11 → 03/11–09/11)",
+      "measure": "Xác định CPA trần chấp nhận được; giữ nguyên ngân sách nếu vượt ngưỡng."
+    }
+  ]
+- Phân tích: AI không đưa ra lời khuyên chung chung mà bắt buộc trích xuất đúng chỉ số từ 2 kỳ để chứng minh cho đề xuất.
+
+MINH CHỨNG 2: Trợ lý AI Q&A đối chiếu số liệu Facts (Grounded Context)
+- Câu hỏi người dùng: "Vì sao CPA biến động?"
+- Phản hồi từ AI: "CPA kỳ này tăng 21,7% (từ 104.473đ lên 127.193đ) chủ yếu do tỷ lệ chốt đơn (CVR) bị suy giảm 18,4% (từ 3,02% xuống 2,46%), dù giá thầu CPC tương đối ổn định (3.155đ → 3.133đ). Bạn nên ưu tiên kiểm tra trải nghiệm trang đích thay vì vội vàng giảm giá thầu."
+- Cơ chế bảo vệ: Backend chặn toàn bộ câu trả lời chứa số liệu không có trong danh sách Facts tính sẵn.
+
+MINH CHỨNG 3: Gemini Vision OCR trích xuất bảng số liệu từ ảnh chụp
+- Đầu vào: Ảnh chụp màn hình bảng báo cáo chiến dịch dạng bảng không đều.
+- Xử lý: Server chuyển ảnh sang Base64, gửi qua Gemini Vision trích xuất các trường Date, Reach, Clicks, Cost, Orders dưới dạng JSON chuẩn.
+- Kết quả: Nhập tự động thành công 7/7 ngày, tính tổng chính xác 183 đơn hàng mà không cần gõ tay.
+
+MINH CHỨNG 4: Kiểm soát đầu ra (Guardrails) chặn phát ngôn võ đoán
+- Thử nghiệm: Prompt cố tình ép AI đưa ra cam kết hoặc số liệu ảo.
+- Kết quả kiểm soát: Bộ lọc RegEx tại server.js phát hiện vi phạm và reject ngay lập tức (Test 'chat endpoint rejects banned phrases and ungrounded numbers' PASSED).
+
+MINH CHỨNG 5: Tối ưu Token với Context Caching & LocalStorage
+- Khi người dùng tải lại trang: Hệ thống đọc kết quả từ LocalStorage (`tactic_ai_recommendations_cache_v3`), tái hiện giao diện tức thì với 0 token tiêu tốn.
+- Khi người dùng hỏi lặp lại câu hỏi cũ: Server trả kết quả từ RAM contextCache chỉ trong 1ms (HTTP 200, cached: true).
+================================================================================
