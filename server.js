@@ -343,6 +343,26 @@ function createServer({fetchAI = fetch, env = process.env} = {}) {
       }
     }
 
+    // Video Demo Stream & Download route
+    if ((pathname === '/tactic_demo_1m30s.mp4' || pathname === '/demo-video.mp4' || pathname === '/video.mp4') && (req.method === 'GET' || req.method === 'HEAD')) {
+      const videoPath = path.join(__dirname, 'tactic_demo_1m30s.mp4');
+      try {
+        const stat = fsSync.statSync(videoPath);
+        res.writeHead(200, {
+          'Content-Type': 'video/mp4',
+          'Content-Length': stat.size,
+          'Accept-Ranges': 'bytes',
+          'Cache-Control': 'public, max-age=86400'
+        });
+        if (req.method === 'HEAD') {
+          return res.end();
+        }
+        return fsSync.createReadStream(videoPath).pipe(res);
+      } catch (err) {
+        return json(404, { error: 'Video demo chưa hoàn tất hoặc không tìm thấy' });
+      }
+    }
+
     const file = publicFiles[pathname];
     if (!file || (req.method !== 'GET' && req.method !== 'HEAD')) {
       res.writeHead(404);

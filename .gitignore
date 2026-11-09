@@ -9,3 +9,6 @@ tests/*.png
 # Tài liệu .md chỉ giữ ở local, không đưa lên server/git (quy tắc triển khai)
 *.md
 *.zip
+*.mp4
+*.webm
+recordings/

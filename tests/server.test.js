@@ -113,6 +113,12 @@ test('source ZIP download endpoints and HEAD request support', async t => {
   const resHeadIndex = await fetch(`http://127.0.0.1:${port}/`, { method: 'HEAD' });
   assert.equal(resHeadIndex.status, 200);
   assert.equal(resHeadIndex.headers.get('content-type'), 'text/html');
+
+  // HEAD /demo-video.mp4
+  const resVideo = await fetch(`http://127.0.0.1:${port}/demo-video.mp4`, { method: 'HEAD' });
+  assert.equal(resVideo.status, 200);
+  assert.equal(resVideo.headers.get('content-type'), 'video/mp4');
+  assert.equal(resVideo.headers.get('accept-ranges'), 'bytes');
 });
 
 
