@@ -6,6 +6,42 @@
 // Storage keys (v3 clean production state)
 const STORAGE_KEY = "tactic_kpi_campaign_data_v3";
 const CAMPAIGN_NAME_KEY = "tactic_campaign_name_v3";
+const AI_RECOMMENDATIONS_STORAGE_KEY = "tactic_ai_recommendations_cache_v3";
+
+function loadAiRecommendationsFromStorage(key) {
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(AI_RECOMMENDATIONS_STORAGE_KEY);
+    if (!raw) return null;
+    const cache = JSON.parse(raw);
+    return cache && cache[key] ? cache[key] : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveAiRecommendationsToStorage(key, data) {
+  if (!key || !data) return;
+  try {
+    let cache = {};
+    const raw = localStorage.getItem(AI_RECOMMENDATIONS_STORAGE_KEY);
+    if (raw) {
+      try { cache = JSON.parse(raw) || {}; } catch {}
+    }
+    cache[key] = data;
+    const keys = Object.keys(cache);
+    if (keys.length > 30) {
+      delete cache[keys[0]];
+    }
+    localStorage.setItem(AI_RECOMMENDATIONS_STORAGE_KEY, JSON.stringify(cache));
+  } catch (e) {}
+}
+
+function clearAiRecommendationsStorage() {
+  try {
+    localStorage.removeItem(AI_RECOMMENDATIONS_STORAGE_KEY);
+  } catch {}
+}
 
 // Clean up all legacy caches from previous development builds
 try {
@@ -230,6 +266,7 @@ function clearAllData(e) {
     state.geminiAnalysisResult = null;
     state.currentContextId = null;
     state.selectedRowId = null;
+    clearAiRecommendationsStorage();
     const thread = document.getElementById("ai-chat-thread");
     if (thread) {
       thread.innerHTML = "";
@@ -1024,8 +1061,27 @@ function analysisSnapshot() {
 }
 function analyzeCampaignIntelligence() {
   const result = analysisSnapshot();
+  const key = JSON.stringify(result);
+
+  // 1. Kiểm tra RAM trước; nếu RAM chưa có hoặc khác key, nạp từ localStorage
+  if (!state.geminiAnalysisResult || state.geminiAnalysisResult.key !== key) {
+    const stored = loadAiRecommendationsFromStorage(key);
+    if (stored && Array.isArray(stored.recommendations) && stored.recommendations.length === 3) {
+      state.geminiAnalysisResult = {
+        key,
+        recommendations: stored.recommendations,
+        contextId: stored.contextId,
+        driver: stored.driver,
+        fromCache: true
+      };
+      if (stored.contextId) {
+        state.currentContextId = stored.contextId;
+      }
+    }
+  }
+
   const cached = state.geminiAnalysisResult;
-  const ai = cached && cached.key === JSON.stringify(result);
+  const ai = cached && cached.key === key;
   const recommendations = ai ? cached.recommendations : result.recommendations;
   const driverText = result.complete && result.driver?.driverSummary ? `\nPhân rã biến động CPA (CPA = CPC ÷ CVR): ${result.driver.driverSummary}` : '';
   const rangeHeader = result.prevStart
@@ -1048,7 +1104,12 @@ function analyzeCampaignIntelligence() {
     driverText,
     trendMetrics: [],
     trendSummary: `${rangeHeader}\nĐánh giá chung: ${result.conclusion}.${driverText}\nSố ngày ghi nhận: ${result.coverage.current}/${result.days} ngày.${result.prevStart ? ` Ngưỡng ổn định: ±${result.threshold}% (quy ước).` : ' Đang trong giai đoạn thu thập dữ liệu ban đầu (< 7 ngày).'}\n${result.complete ? 'Chi tiết số liệu: ' + result.evidence.map(e=>e.text).join('\n') : 'Đang đánh giá trực tiếp số liệu từ ngày ' + (result.start || '—') + ' đến ' + (result.end || '—') + '; hệ thống sẽ kích hoạt 03 gợi ý tối ưu chiến dịch khi tích lũy đủ 7 ngày.'}\nLưu ý: Click/reach không phải là CTR (click/lượt hiển thị). Tổng reach theo ngày có thể trùng lặp người xem giữa các ngày. Chưa đủ dữ liệu xác định nguyên nhân hoặc lợi nhuận.`,
-    recommendations: recommendations.map((r,i)=>({pillar: `${i+1}. ${ai ? 'AI hỗ trợ · cần kiểm chứng' : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá dữ liệu ban đầu')}`,title:r.title,desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'}))
+    recommendations: recommendations.map((r,i)=>({
+      pillar: `${i+1}. ${ai ? (cached?.fromCache ? 'AI khuyến nghị · từ bộ nhớ' : 'AI hỗ trợ · cần kiểm chứng') : (result.complete ? 'Gợi ý cải thiện chiến dịch' : 'Đánh giá dữ liệu ban đầu')}`,
+      title:r.title,
+      desc:`Vì sao: ${r.why} Đo thế nào: ${r.measure}`,
+      action:result.complete ? 'Thử và đo lại' : 'Theo dõi tiếp'
+    }))
   };
 }
 function analyzeCampaignIntelligenceOffline() { return analyzeCampaignIntelligence(); }
@@ -1250,6 +1311,29 @@ function renderAiAnalysis() {
       `;
       })
       .join("");
+  }
+
+  updateAiButtonState();
+}
+
+function updateAiButtonState() {
+  const btn = document.getElementById('btn-run-gemini-ai');
+  const label = document.getElementById("gemini-btn-text");
+  if (!btn || !label) return;
+
+  const snapshot = analysisSnapshot();
+  const key = JSON.stringify(snapshot);
+  const cached = state.geminiAnalysisResult;
+  const isCachedAi = cached && cached.key === key;
+
+  if (isCachedAi) {
+    label.textContent = "Làm mới gợi ý AI";
+    btn.title = "Đã lưu 3 gợi ý AI trong LocalStorage (0 token). Nhấp để AI phân tích lại.";
+    btn.classList.add("text-primary-token");
+  } else {
+    label.textContent = "AI hỗ trợ cải thiện";
+    btn.title = "Phân tích chuyên sâu bằng AI";
+    btn.classList.remove("text-primary-token");
   }
 }
 
@@ -1791,7 +1875,9 @@ async function runGeminiAiAnalysis() {
   const key = JSON.stringify(snapshot);
   const btn = document.getElementById('btn-run-gemini-ai');
   const label = document.getElementById("gemini-btn-text");
-  state.isGeminiLoading = true; btn.disabled = true; label.textContent = "Đang tạo gợi ý…";
+  state.isGeminiLoading = true;
+  if (btn) btn.disabled = true;
+  if (label) label.textContent = "Đang tạo gợi ý…";
   try {
     const response = await fetch('/api/recommendations', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows:state.data,days:snapshot.days,threshold:snapshot.threshold}),signal:AbortSignal.timeout(25000)});
     if (!response.ok) throw new Error('AI unavailable');
@@ -1799,12 +1885,22 @@ async function runGeminiAiAnalysis() {
     if (!Array.isArray(result.recommendations) || result.recommendations.length !== 3 || !result.recommendations.every(r=>['title','why','measure'].every(k=>typeof r[k] === 'string'))) throw new Error('Invalid response');
     if (key !== JSON.stringify(analysisSnapshot())) return;
     state.currentContextId = result.contextId || null;
-    state.geminiAnalysisResult = {key,recommendations:result.recommendations,contextId:result.contextId,driver:result.driver};
-    renderAiAnalysis(); showToast('Đã nhận 3 gợi ý AI; kết luận vẫn do quy tắc xác định.', 'success');
+    const aiData = {key, recommendations: result.recommendations, contextId: result.contextId, driver: result.driver, savedAt: Date.now()};
+    state.geminiAnalysisResult = aiData;
+    saveAiRecommendationsToStorage(key, aiData);
+    renderAiAnalysis();
+    updateAiButtonState();
+    showToast('Đã nhận 3 gợi ý AI (đã lưu bộ nhớ để tải lại không tốn token).', 'success');
   } catch {
-    state.geminiAnalysisResult = null; renderAiAnalysis();
+    state.geminiAnalysisResult = null;
+    renderAiAnalysis();
+    updateAiButtonState();
     showToast('AI chưa khả dụng. Đang dùng 3 gợi ý theo quy tắc.', 'info');
-  } finally { state.isGeminiLoading = false; btn.disabled = false; label.textContent = "AI hỗ trợ cải thiện"; }
+  } finally {
+    state.isGeminiLoading = false;
+    if (btn) btn.disabled = false;
+    updateAiButtonState();
+  }
 }
 
 function escapeHtml(text) {
