@@ -91,11 +91,43 @@ function cleanOldCache() {
 
 function createServer({fetchAI = fetch, env = process.env} = {}) {
   const resolvedModel = env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const LOGS_DIR = path.join(__dirname, 'logs');
+  try { fsSync.mkdirSync(LOGS_DIR, { recursive: true }); } catch {}
+  const accessLogPath = path.join(LOGS_DIR, 'access.log');
+
   return http.createServer(async (req, res) => {
+    const start = Date.now();
+    const clientIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const country = req.headers['cf-ipcountry'] || '-';
+    const ua = req.headers['user-agent'] || '-';
+
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      const logLine = `[${new Date().toISOString()}] IP=${clientIp} (${country}) "${req.method} ${req.url}" ${res.statusCode} ${duration}ms UA="${ua}"\n`;
+      try {
+        fsSync.appendFileSync(accessLogPath, logLine);
+      } catch {}
+      console.log(logLine.trim());
+    });
+
     const json = (status, data) => {
       res.writeHead(status, {'Content-Type': 'application/json'});
       res.end(JSON.stringify(data));
     };
+
+    if (req.url === '/api/access-stats' && (req.method === 'GET' || req.method === 'HEAD')) {
+      try {
+        if (!fsSync.existsSync(accessLogPath)) {
+          return json(200, { total: 0, entries: [] });
+        }
+        const content = fsSync.readFileSync(accessLogPath, 'utf8');
+        const lines = content.trim().split('\n').filter(Boolean);
+        const last50 = lines.slice(-50).reverse();
+        return json(200, { total: lines.length, recent: last50 });
+      } catch (err) {
+        return json(500, { error: err.message });
+      }
+    }
 
     if (req.url === '/api/recommendations' && req.method === 'POST') {
       try {

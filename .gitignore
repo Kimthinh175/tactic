@@ -12,3 +12,4 @@ tests/*.png
 *.mp4
 *.webm
 recordings/
+logs/
